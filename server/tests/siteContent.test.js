@@ -4,8 +4,11 @@ import { contentPatchSchema, validate } from '../src/validators/code.validator.j
 import { DEFAULT_CONTENT, resolveContent } from '../src/config/siteContent.js';
 
 test('site content defaults provide exactly three footer columns', () => {
-  assert.equal(resolveContent(null).footer.columns.length, 3);
-  assert.equal(resolveContent(null).published, true);
+  const content = resolveContent(null);
+  assert.equal(content.footer.columns.length, 3);
+  assert.equal(content.published, true);
+  assert.equal(content.footer.columns[0].links.find((link) => link.id === 'download')?.href, '/download');
+  assert.equal(content.navigation.links.find((link) => link.id === 'download')?.href, '/download');
 });
 
 test('site content rejects unsafe navigation URLs', () => {

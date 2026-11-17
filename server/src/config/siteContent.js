@@ -13,8 +13,9 @@ export const DEFAULT_CONTENT = {
       { id: 'home', label: 'Home', href: '/', enabled: true, order: 10 },
       { id: 'about', label: 'About', href: '/about', enabled: true, order: 20 },
       { id: 'ai', label: 'AI Tools', href: '/ai', enabled: true, order: 30 },
-      { id: 'contact', label: 'Contact', href: '/contact', enabled: true, order: 40 },
-      { id: 'support', label: 'Support', href: '/support', enabled: true, order: 50 },
+      { id: 'download', label: 'Download', href: '/download', enabled: true, order: 40 },
+      { id: 'contact', label: 'Contact', href: '/contact', enabled: true, order: 50 },
+      { id: 'support', label: 'Support', href: '/support', enabled: true, order: 60 },
     ],
   },
   footer: {
@@ -23,7 +24,8 @@ export const DEFAULT_CONTENT = {
       { id: 'product', title: 'Product', links: [
         { id: 'home', label: 'Home', href: '/', enabled: true, order: 10 },
         { id: 'ide', label: 'Launch IDE', href: '/ide', enabled: true, order: 20 },
-        { id: 'ai', label: 'AI Tools', href: '/ai', enabled: true, order: 30 },
+        { id: 'download', label: 'Download', href: '/download', enabled: true, order: 30 },
+        { id: 'ai', label: 'AI Tools', href: '/ai', enabled: true, order: 40 },
       ] },
       { id: 'resources', title: 'Resources & Company', links: [
         { id: 'login', label: 'Login', href: '/account/login', enabled: true, order: 10 },
