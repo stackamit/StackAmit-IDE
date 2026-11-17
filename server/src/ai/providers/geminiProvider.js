@@ -23,7 +23,14 @@ export function createGeminiProvider(config = aiConfig.gemini) {
     async listModels({ signal } = {}) {
       if (!config.enabled) return [];
       const data = await fetchJson(`${config.baseUrl}/models?key=${encodeURIComponent(config.apiKey)}`, { signal }, provider);
-      return (Array.isArray(data.models) ? data.models : []).filter((m) => (m.supportedGenerationMethods || []).includes('generateContent')).map((m) => ({ id: String(m.name || '').replace(/^models\//, ''), name: m.displayName || m.name }));
+      // The chat adapter always uses streamGenerateContent. Gemini exposes
+      // other generateContent-capable models (TTS, image, research, etc.)
+      // that cannot serve this text-streaming contract, so do not advertise
+      // them as verified chat models.
+      return (Array.isArray(data.models) ? data.models : []).filter((m) => {
+        const methods = Array.isArray(m.supportedGenerationMethods) ? m.supportedGenerationMethods : [];
+        return methods.includes('generateContent') && methods.includes('streamGenerateContent');
+      }).map((m) => ({ id: String(m.name || '').replace(/^models\//, ''), name: m.displayName || m.name }));
     },
     async generate({ model, messages, signal }) {
       let text = '';
