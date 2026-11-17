@@ -39,13 +39,23 @@ test('Gemini invalid credentials become an unavailable health result', async () 
   finally { global.fetch = original; }
 });
 
-test('Gemini model discovery only exposes models supported by streaming chat', async () => {
+test('Gemini model discovery accepts API responses that omit streamGenerateContent', async () => {
   const original = global.fetch;
   global.fetch = async () => new Response(JSON.stringify({ models: [
     { name: 'models/gemini-2.5-flash', displayName: 'Gemini 2.5 Flash', supportedGenerationMethods: ['generateContent', 'streamGenerateContent'] },
-    { name: 'models/gemini-tts', displayName: 'Gemini TTS', supportedGenerationMethods: ['generateContent'] },
+    { name: 'models/gemini-tts', displayName: 'Gemini TTS', supportedGenerationMethods: [] },
   ] }));
   try {
     await assert.deepEqual(await createGeminiProvider({ enabled: true, apiKey: 'test', baseUrl: 'https://generativelanguage.googleapis.com/v1beta', defaultModel: '' }).listModels(), [{ id: 'gemini-2.5-flash', name: 'Gemini 2.5 Flash' }]);
+  } finally { global.fetch = original; }
+});
+
+test('Gemini health is unavailable when the configured key returns no text models', async () => {
+  const original = global.fetch;
+  global.fetch = async () => new Response(JSON.stringify({ models: [] }));
+  try {
+    const result = await createGeminiProvider({ enabled: true, apiKey: 'test', baseUrl: 'https://generativelanguage.googleapis.com/v1beta', defaultModel: '' }).healthCheck();
+    assert.equal(result.available, false);
+    assert.equal(result.code, 'AI_MODELS_UNAVAILABLE');
   } finally { global.fetch = original; }
 });

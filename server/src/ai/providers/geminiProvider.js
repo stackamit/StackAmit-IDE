@@ -17,20 +17,21 @@ export function createGeminiProvider(config = aiConfig.gemini) {
     configured: Boolean(config.enabled),
     async healthCheck({ signal } = {}) {
       if (!config.enabled) return { available: false, configured: false, reason: 'NOT_CONFIGURED' };
-      try { await this.listModels({ signal }); return { available: true, configured: true }; }
+      try { const models = await this.listModels({ signal }); return models.length ? { available: true, configured: true, modelCount: models.length } : { available: false, configured: true, code: 'AI_MODELS_UNAVAILABLE', message: 'Gemini returned no text-generation models for this key.' }; }
       catch (error) { return { available: false, configured: true, code: error.code, message: error.message }; }
     },
     async listModels({ signal } = {}) {
       if (!config.enabled) return [];
       const data = await fetchJson(`${config.baseUrl}/models?key=${encodeURIComponent(config.apiKey)}`, { signal }, provider);
-      // The chat adapter always uses streamGenerateContent. Gemini exposes
-      // other generateContent-capable models (TTS, image, research, etc.)
-      // that cannot serve this text-streaming contract, so do not advertise
-      // them as verified chat models.
-      return (Array.isArray(data.models) ? data.models : []).filter((m) => {
+      const models = (Array.isArray(data.models) ? data.models : []).filter((m) => {
         const methods = Array.isArray(m.supportedGenerationMethods) ? m.supportedGenerationMethods : [];
-        return methods.includes('generateContent') && methods.includes('streamGenerateContent');
+        return methods.includes('generateContent');
       }).map((m) => ({ id: String(m.name || '').replace(/^models\//, ''), name: m.displayName || m.name }));
+      // Some Gemini API versions do not list streamGenerateContent even when
+      // streamGenerateContent works for their generateContent models. Keep the
+      // provider response as the source of truth instead of hardcoding model
+      // names or showing an empty model selector.
+      return models;
     },
     async generate({ model, messages, signal }) {
       let text = '';
