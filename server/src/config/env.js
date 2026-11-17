@@ -21,7 +21,10 @@ export const env = {
   nodeEnv: process.env.NODE_ENV || 'development',
   isProd: (process.env.NODE_ENV || 'development') === 'production',
   port: num(process.env.PORT, 5000),
-  clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',
+  // Browser Origin values never contain a trailing slash. Normalize the
+  // deployment setting so a harmless CLIENT_URL mismatch cannot break CORS
+  // and the cookie-authenticated CSRF flow.
+  clientUrl: String(process.env.CLIENT_URL || 'http://localhost:5173').trim().replace(/\/+$/, ''),
   mongoUri: process.env.MONGODB_URI || '',
   logLevel: process.env.LOG_LEVEL || 'info',
 

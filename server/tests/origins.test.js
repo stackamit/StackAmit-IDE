@@ -29,6 +29,11 @@ test('the configured client origin and dev loopbacks are allowed', () => {
   assert.ok(isAllowedOrigin(undefined));
 });
 
+test('configured client origins are normalized without trailing slashes', () => {
+  assert.equal(env.clientUrl.endsWith('/'), false);
+  assert.equal(isAllowedOrigin('https://stackamit-ide.netlify.app/'), false);
+});
+
 test('unrelated origins are rejected, including look-alikes', () => {
   assert.ok(!isAllowedOrigin('https://evil.example'));
   assert.ok(!isAllowedOrigin('http://localhost:5173.evil.example'));
