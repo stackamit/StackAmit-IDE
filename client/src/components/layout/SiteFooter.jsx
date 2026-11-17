@@ -29,7 +29,12 @@ export default function SiteFooter() {
   const product = findColumn(columns, /product/i, 0);
   const resources = findColumn(columns, /resource|company/i, 1);
   const productLinks = sortLinks(product);
-  const resourceLinks = sortLinks(resources);
+  const resourceLinks = sortLinks(resources).filter((item) => {
+    const identity = `${item.id} ${item.label}`;
+    if (user && /login|register|sign[ -]?in|sign[ -]?up/i.test(identity)) return false;
+    if (!user && /dashboard|account dashboard/i.test(identity)) return false;
+    return true;
+  });
   const legalLinks = columns.flatMap((column) => column.links || [])
     .filter((item) => item?.enabled !== false && item?.label && item?.href && isLegalLink(item))
     .sort((a, b) => (a.order || 0) - (b.order || 0));

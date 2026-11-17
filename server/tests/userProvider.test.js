@@ -19,6 +19,14 @@ test('provider credentials use authenticated encryption and masked display value
   } finally { env.aiCredentialEncryptionKey = previous; }
 });
 
+test('credential vault rejects keys that are not exactly 32 bytes', () => {
+  const previous = env.aiCredentialEncryptionKey;
+  env.aiCredentialEncryptionKey = '4ca100485109561b03564470cdf2c66b';
+  try {
+    assert.throws(() => encryptCredential('sk-user-private-key'), (error) => error.code === 'AI_CREDENTIAL_VAULT_NOT_CONFIGURED' && error.status === 503);
+  } finally { env.aiCredentialEncryptionKey = previous; }
+});
+
 test('user provider endpoints require an end-user session', async () => {
   const response = await request(app).get('/api/user/ai/providers');
   assert.equal(response.status, 401);
