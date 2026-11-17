@@ -3,10 +3,11 @@ import { adminApi } from './admin.js';
 import { ensureUserCsrf } from './userCsrf.js';
 
 const desktop = () => typeof window !== 'undefined' ? window.stackamit?.ai?.ollama : null;
+const desktopAuth = () => typeof window !== 'undefined' ? window.stackamit?.auth : null;
 const currentMode = () => 'user';
 export async function getAiCatalog(mode = currentMode()) { if (mode === 'admin') return adminApi.aiProviders(); const { data } = await http.get('/api/ai/providers'); return data; }
-export async function getProviderHealth(provider, mode = currentMode()) { if (mode === 'admin') return adminApi.aiHealth(provider); if (provider === 'ollama' && desktop()) return desktop().health(); const { data } = await http.get(`/api/user/ai/providers/${encodeURIComponent(provider)}/test`, { withCredentials: true }); return data.health || data; }
-export async function getProviderModels(provider, mode = currentMode()) { if (mode === 'admin') return adminApi.aiModels(provider); if (provider === 'ollama' && desktop()) { const data = await desktop().models(); return data.models || []; } const { data } = await http.get(`/api/user/ai/providers/${encodeURIComponent(provider)}/models`, { withCredentials: true }); return data.models || []; }
+export async function getProviderHealth(provider, mode = currentMode()) { if (mode === 'admin') return adminApi.aiHealth(provider); if (provider === 'ollama' && desktop()) return desktop().health(); const path = `/api/user/ai/providers/${encodeURIComponent(provider)}/test`; if (desktopAuth()) { const data = await desktopAuth().request({ path, method: 'GET' }); return data.health || data; } const { data } = await http.get(path, { withCredentials: true }); return data.health || data; }
+export async function getProviderModels(provider, mode = currentMode()) { if (mode === 'admin') return adminApi.aiModels(provider); if (provider === 'ollama' && desktop()) { const data = await desktop().models(); return data.models || []; } const path = `/api/user/ai/providers/${encodeURIComponent(provider)}/models`; if (desktopAuth()) { const data = await desktopAuth().request({ path, method: 'GET' }); return data.models || []; } const { data } = await http.get(path, { withCredentials: true }); return data.models || []; }
 async function readSse(response, handlers) {
   if (!response.ok) throw new Error(`AI request failed (${response.status}).`);
   const reader = response.body?.getReader(); if (!reader) throw new Error('AI provider returned no stream.');
