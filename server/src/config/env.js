@@ -25,6 +25,10 @@ export const env = {
   // deployment setting so a harmless CLIENT_URL mismatch cannot break CORS
   // and the cookie-authenticated CSRF flow.
   clientUrl: String(process.env.CLIENT_URL || 'http://localhost:5173').trim().replace(/\/+$/, ''),
+  // Netlify and Render are different sites in production, so browser user
+  // sessions must be sent on credentialed cross-origin API requests. Local
+  // development remains SameSite=Lax.
+  userCookieSameSite: ((process.env.NODE_ENV || 'development') === 'production') ? 'none' : 'lax',
   mongoUri: process.env.MONGODB_URI || '',
   logLevel: process.env.LOG_LEVEL || 'info',
 

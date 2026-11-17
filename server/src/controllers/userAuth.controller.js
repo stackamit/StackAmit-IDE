@@ -10,10 +10,10 @@ import { sendEmail } from '../services/email.service.js';
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 function safeUser(user) { return { id: String(user._id), email: user.email, status: user.status, emailVerified: Boolean(user.emailVerifiedAt), createdAt: user.createdAt, displayName: user.displayName || '', preferences: user.preferences || { theme: 'dark' } }; }
-function csrfCookie(res) { const token = randomToken(); res.cookie('stackamit_csrf', token, { sameSite: 'lax', secure: env.isProd, httpOnly: false, maxAge: env.userTokenTtlDays * 86400000, path: '/' }); return token; }
-function sessionCookie(res, token) { res.cookie('stackamit_user', token, { sameSite: 'lax', secure: env.isProd, httpOnly: true, maxAge: env.userTokenTtlDays * 86400000, path: '/' }); csrfCookie(res); }
+function csrfCookie(res) { const token = randomToken(); res.cookie('stackamit_csrf', token, { sameSite: env.userCookieSameSite, secure: env.isProd, httpOnly: false, maxAge: env.userTokenTtlDays * 86400000, path: '/' }); return token; }
+function sessionCookie(res, token) { res.cookie('stackamit_user', token, { sameSite: env.userCookieSameSite, secure: env.isProd, httpOnly: true, maxAge: env.userTokenTtlDays * 86400000, path: '/' }); csrfCookie(res); }
 
-export function csrf(_req, res) { csrfCookie(res); return res.json({ ok: true }); }
+export function csrf(_req, res) { const token = csrfCookie(res); return res.json({ ok: true, token }); }
 
 async function registerAccount(req) {
   if (!env.userJwtSecret) throw new ApiError('User authentication is not configured.', { status: 503, code: 'USER_AUTH_NOT_CONFIGURED' });
@@ -176,5 +176,5 @@ export async function updateProfile(req, res, next) {
 }
 
 export async function logout(req, res, next) {
-  try { await UserSession.updateOne({ _id: req.userSessionId, userId: req.user.id }, { $set: { revokedAt: new Date() } }); res.clearCookie('stackamit_user', { httpOnly: true, sameSite: 'lax', secure: env.isProd, path: '/' }); res.clearCookie('stackamit_csrf', { sameSite: 'lax', secure: env.isProd, path: '/' }); return res.json({ ok: true }); } catch (error) { return next(error); }
+  try { await UserSession.updateOne({ _id: req.userSessionId, userId: req.user.id }, { $set: { revokedAt: new Date() } }); res.clearCookie('stackamit_user', { httpOnly: true, sameSite: env.userCookieSameSite, secure: env.isProd, path: '/' }); res.clearCookie('stackamit_csrf', { sameSite: env.userCookieSameSite, secure: env.isProd, path: '/' }); return res.json({ ok: true }); } catch (error) { return next(error); }
 }

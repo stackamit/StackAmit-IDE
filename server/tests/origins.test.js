@@ -34,6 +34,11 @@ test('configured client origins are normalized without trailing slashes', () => 
   assert.equal(isAllowedOrigin('https://stackamit-ide.netlify.app/'), false);
 });
 
+test('user cookie policy is cross-origin safe in production and local-safe in development', () => {
+  assert.ok(['lax', 'none'].includes(env.userCookieSameSite));
+  assert.equal(env.userCookieSameSite, env.isProd ? 'none' : 'lax');
+});
+
 test('unrelated origins are rejected, including look-alikes', () => {
   assert.ok(!isAllowedOrigin('https://evil.example'));
   assert.ok(!isAllowedOrigin('http://localhost:5173.evil.example'));
