@@ -1,0 +1,303 @@
+================================================================================
+StackAmit-IDE — Project Context
+--------------------------------------------------------------------------------
+The "what's the situation right now" file. Snapshot of the workspace and
+everything an engineer/agent needs to orient before touching code.
+Updated: 19 October 2026
+================================================================================
+
+§1  ONE-LINER
+--------------------------------------------------------------------------------
+Online compiler + Monaco editor for Python / C / C++ / Java / JavaScript
+(Node.js), shipped in TWO modes from one React renderer: a Web app and an
+Electron DESKTOP IDE (real filesystem + integrated terminal behind a secure IPC
+bridge). MERN monorepo + an Express API that proxies to a batch execution
+provider, plus a local-interactive WebSocket path for real stdin on the
+developer's own machine. The full /ide shell runs in both modes.
+
+§2  WHO / WHERE / WHY
+--------------------------------------------------------------------------------
+  Product  : StackAmit-IDE
+  Company  : StackAmit — https://stackamit.netlify.app
+  Tagline  : Code. Compile. Create.
+  Users    : students, educators/interviewers, developers wanting a scratchpad.
+  Value    : zero-install, real execution, editor-grade ergonomics.
+  Dev OS   : Windows 22H2 (host user's primary desktop).
+  Repo     : e:\StackAmit-IDE\ (single Git repo, three package.jsons).
+
+§3  CURRENT DEV-STACK STATE
+--------------------------------------------------------------------------------
+  npm run dev (at root) starts BOTH:
+    • API server  :5000  via `node --watch --watch-path=src src/server.js`
+    • Vite        :5173  via `npm run dev` in /client
+    Vite proxies /api → :5000 including WebSocket upgrades (ws:true).
+
+  Confirmed currently up (19 Oct 2026):
+    GET /api/health → ok, provider=wandbox
+    GET /api/interactive/status → enabled=true, runtimes {python:true,
+                                  javascript:true, c:false, cpp:false,
+                                  java:false}
+    GET /api/interactive/install/plan/c → winget install --id
+        BrechtSanders.WinLibs.POSIX.UCRT -e
+    Client build → production build OK; Monaco workers bundled (no CDN)
+    Electron   → typecheck clean; main.cjs+preload.cjs build; NSIS installer
+                 produced at client/release/StackAmit-IDE Setup 1.0.0.exe
+    Client tests → vitest 35 passed (Terminal, languageDefaults, langForFile,
+                   workspace web provider, electron workspaceFs guard)
+    Server tests → 25 pass / 0 fail / 6 skipped
+
+  Local machine has:
+    • Python at C:\Python314 (detected as `python`)
+    • Node.js (v24.20.0 at least; v22.x LTS also fine)
+    • winget present + choco present (scoop NOT installed)
+    • NO gcc/g++/clang/tcc/cl/javac/java on PATH yet
+  Consequence: Interactive + live-lint work out-of-the-box for Python and
+  JavaScript. For C/C++/Java the user must click Install in the popup
+  (accept the Windows UAC prompt) — after install the server refreshes PATH
+  from the registry AND scans known folders so the toolchain becomes usable
+  without restarting the dev stack.
+
+§4  MONOREPO SHAPE
+--------------------------------------------------------------------------------
+  e:\StackAmit-IDE\
+    package.json        root orchestration (concurrently + wrappers)
+    README.md           user-facing docs (563 lines)
+    assets\logo.jpg     canonical brand image
+    client\              (Vite + React 18 + Tailwind + ELECTRON desktop)
+    server\              (Express + Mongoose optional)
+    projectPRD.txt      product requirements (this set)
+    memory.txt          long-term decisions & pitfalls (this set)
+    skills.txt          required engineering knowledge (this set)
+    context.txt         this file
+    agent.txt           agent playbook (this set)
+    *.png               recent verification screenshots
+
+  Root npm scripts (call into subpackages with `npm --prefix …`):
+    dev             ⇒ concurrently server + client
+    dev:server      ⇒ cd server && npm run dev
+    dev:client      ⇒ cd client && npm run dev
+    dev:desktop     ⇒ cd client && npm run dev:electron (Electron dev)
+    start           ⇒ production server start (cross-env NODE_ENV=production)
+    build           ⇒ client production build
+    build:desktop   ⇒ cd client && npm run build:electron (esbuild TS->CJS)
+    dist:win        ⇒ cd client && npm run dist:win (electron-builder NSIS)
+    test            ⇒ server tests (node --test)
+    test:client     ⇒ cd client && npm run test (vitest, incl. /ide + electron)
+    install:all     ⇒ install root + server + client in one shot
+
+§5  BACKEND HTTP ROUTES
+--------------------------------------------------------------------------------
+  GET    /                              API self-describe
+  GET    /api/health                    {status, execution:{provider,...}}
+  GET    /api/languages                 list metadata for the selector
+  GET    /api/execution/status          provider reachability
+  POST   /api/code/run                  batch execute (rate-limited)
+  POST   /api/code/lint                 local syntax check (rate-limited)
+  GET    /api/interactive/status        {enabled, runtimes{...}}
+  GET    /api/interactive/install/plan/:language
+                                        consent-preview command for popup
+  WS     /api/interactive               start / stdin / stop / install
+  POST   /api/snippets                  save snippet (needs DB)
+  GET    /api/snippets/:id              read snippet (needs DB)
+  GET    /api/site/settings             banner + snippetEnabled toggle
+  GET    /api/site/content              Home/About/Contact copy
+  POST   /api/site/contact              submit contact form
+  POST   /api/admin/login               JWT bearer issue
+  …      /api/admin/*                    protected dashboard endpoints
+
+§6  FRONTEND ROUTES
+--------------------------------------------------------------------------------
+  /                 Home (marketing); on DESKTOP redirects to /ide
+  /about            About (marketing)
+  /contact          Contact form (marketing)
+  /editor           Legacy single-file IDE (Workspace.jsx — Monaco + Terminal)
+  /ide              FULL IDE shell (IdeApp.jsx → IdeShell.jsx) — web + desktop
+  /snippet/:id      Read-only snippet viewer
+  /login            Admin sign-in
+  /admin            Protected admin dashboard
+  Router: BrowserRouter on web, HashRouter on desktop (App.jsx picks by
+  isDesktopMode()). Marketing CTAs (SiteHeader/Home/Admin) now link to /ide.
+
+§7  EXTERNAL DEPENDENCIES
+--------------------------------------------------------------------------------
+  Wandbox     https://wandbox.org/api   (default execution provider)
+  Piston      https://emkc.org/api/v2/piston   (whitelist-only public tier)
+  Company     https://stackamit.netlify.app    (brand link in navbar/footer)
+  Mongodb     optional; MONGODB_URI must be set to enable persistence
+
+§8  LANGUAGE COVERAGE & PIPELINE
+--------------------------------------------------------------------------------
+  Language     Editor   Batch run   Interactive   Live lint   Installer
+  Python       Monaco   Wandbox/Piston  local py     py_compile   winget/
+                                       child                            choco
+  JavaScript   Monaco   Wandbox/Piston  local node   native (n/a for
+                                       child                          our lint)
+  C            Monaco   Wandbox/Piston  local gcc    gcc           winget/
+                                       -fsyntax-only                 choco
+  C++          Monaco   Wandbox/Piston  local g++    g++           winget/
+                                       -fsyntax-only                 choco
+  Java         Monaco   Wandbox/Piston  local javac+ javac        winget/
+                                        java                          choco
+
+§9  CURRENT UX / FEATURE STATE
+--------------------------------------------------------------------------------
+  IDE (/editor)
+    Navbar:
+      Left: Logo + "StackAmit" + IDE badge (badge outside anchor).
+      Right: provider pill · font-size select · Settings · Theme toggle ·
+             Format · Save (writes a real file) · Share (copies link) ·
+             Reset · Run.
+    Editor: Monaco, per-language draft autosave, live markers for
+            Python/C/C++/Java via local lint; Monaco-native for JS/TS.
+    Console/Terminal:
+      Toolbar with Batch/Interactive toggle (Interactive offered for every
+      language when the server has localRunEnabled=true). When no local
+      runtime for the chosen language, a clickable "no local runtime ·
+      install" badge appears that opens RuntimeInstallModal.
+    Footer (IDE): keyboard hints only, right-aligned.
+
+  Public (Home/About/Contact via PublicLayout → SiteHeader + SiteFooter)
+    SiteHeader: Logo + StackAmit + IDE badge | Home · About · Contact ·
+                Globe-StackAmit↗ (external) · Launch IDE (button).
+    SiteFooter: brand block with IDE badge + description, Product nav,
+                Company nav (StackAmit↗ · Why StackAmit-IDE · Support),
+                social links, © line.
+
+  Admin dashboard (/admin)
+    Usage stats from ExecutionLog · Contact inbox · Site content editor
+    (hero, features, about copy, social links) · Settings (banner, snippet
+    availability) · Login flow via JWT bearer.
+
+§10  RECENT CHANGES (chronological, latest first)
+--------------------------------------------------------------------------------
+  2026-10-19 · Electron DESKTOP IDE: secure IPC fs (authorized roots +
+               realpath traversal guard), optional node-pty terminal with
+               honest PTY_UNAVAILABLE fallback, contextIsolation/sandbox/CSP,
+               HashRouter on desktop; electron-builder NSIS packaging with
+               win.signAndEditExecutable=false to dodge the winCodeSign
+               symlink-privilege failure.
+  2026-10-19 · /ide FULL shell (web + desktop): IdeShell + ActivityBar +
+               FileExplorer + EditorTabs + MonacoHost + BottomPanel +
+               TerminalPanel(xterm) + StatusBar + TopMenu + CommandOverlay +
+               AiChatPanel(placeholder) + SidebarView; Zustand ideStore +
+               useIdeActions/useIdeTheme.
+  2026-10-19 · Storage abstraction services/workspace.js (web virtual FS +
+               File System Access vs desktop bridge); langForFile util.
+  2026-10-19 · Monaco BUNDLED with Vite ?worker (no CDN); base './'.
+  2026-10-19 · Scripts: client dev:electron/build:electron/typecheck:electron/
+               rebuild/dist:win; root dev:desktop/build:desktop/dist:win/
+               test:client. Cross-platform scripts/dev-electron.mjs.
+  2026-10-19 · /ide tests added (langForFile, workspace provider, electron
+               workspaceFs guard) — 35 client tests green.
+  2026-10-19 · Marketing CTAs (SiteHeader · Home · AdminDashboard) now link
+               to /ide; footer "Online Compiler" + snippets stay on /editor.
+  2026-10-19 · Navbar (SiteHeader) external link now shows
+               "Globe + StackAmit + ArrowUpRight"; never the raw URL.
+  2026-10-19 · SiteHeader + SiteFooter brand block show the "IDE" badge
+               as a sibling of the external anchor (was missing).
+  2026-10-19 · IDE Footer reduced to keyboard hints only.
+  2026-10-19 · Real save-to-computer (showSaveFilePicker + Blob fallback)
+               wired to Navbar Save button and Ctrl/⌘+S.
+  2026-10-19 · Live error highlighting (POST /api/code/lint + Monaco
+               markers, ~700 ms debounce).
+  2026-10-19 · Consent-driven runtime installer popup (winget/choco,
+               PATH refresh from registry, known-folder scan → auto-
+               augment PATH for the IDE).
+  2026-10-19 · Interactive mode offered for every language when the
+               server allows local runs; per-language runtime hint via
+               a clickable badge.
+  2026-10-19 · Local interactive WebSocket runner (/api/interactive):
+               python -u, node, gcc/g++ compile+run, javac+java.
+  2026-10-18 · server.js: EADDRINUSE handler + friendly fatal; node --watch
+               --watch-path=src so node_modules edits don't restart.
+  Earlier    · Monaco + batch execution + 5-language registry, Wandbox
+               default, admin dashboard, marketing site, favicon/logo.
+
+§11  FILE ENTRY POINTS YOU'LL EDIT OFTEN
+--------------------------------------------------------------------------------
+  client\src\pages\Workspace.jsx        IDE page — wires everything
+  client\src\pages\IdeApp.jsx           full-screen /ide route wrapper
+  client\src\components\ide\IdeShell.jsx   the /ide orchestrator (layout+keys)
+  client\src\components\ide\FileExplorer.jsx  create/rename/delete/refresh
+  client\src\components\ide\MonacoHost.jsx    multi-model editor (path prop)
+  client\src\components\ide\TerminalPanel.jsx  xterm ↔ desktop PTY bridge
+  client\src\store\ideStore.js          Zustand IDE state + actions
+  client\src\hooks\useIdeActions.js     central /ide command implementations
+  client\src\services\workspace.js      storage abstraction (web vs desktop)
+  client\src\utils\langForFile.js       ext -> Monaco language + run key
+  client\src\monaco\monacoSetup.js      bundled Monaco + workers (no CDN)
+  client\electron\main.ts / preload.ts / ipc.ts   desktop process + bridge
+  client\electron\services\workspaceFs.ts / terminal.ts  fs guard + PTY
+  client\scripts\build-electron.mjs / dev-electron.mjs    desktop build/launch
+  client\src\components\console\Terminal.jsx        batch + interactive
+  client\src\components\ui\RuntimeInstallModal.jsx  consent popup
+  client\src\components\layout\Navbar.jsx           IDE top bar
+  client\src\components\layout\SiteHeader.jsx       public top nav
+  client\src\components\layout\SiteFooter.jsx       public footer
+  client\src\components\layout\Footer.jsx           IDE bottom bar
+  client\src\services\api.js                         axios facade
+
+  server\src\server.js                         bootstrap + WS attach
+  server\src\app.js                             middleware + routes
+  server\src\config\languages.js              canonical language registry
+  server\src\config\env.js                    all runtime config
+  server\src\services\interactive.service.js  WS child-process runner
+  server\src\services\runtimes.js            toolchain detection
+  server\src\services\runtimeInstaller.js     consent-driven installer
+  server\src\services\lint.service.js         live syntax check
+  server\src\services\execution.service.js    batch provider dispatch
+  server\src\services\providers\*.js          Wandbox/Piston adapters
+  server\src\controllers\code.controller.js   /run + /lint handlers
+
+§12  WHAT STILL NEEDS WORK / WATCH-LIST
+--------------------------------------------------------------------------------
+  • Compiled-language prompt flush caveat (SERVER pipe runner only): printf
+    without trailing "\n" may not appear before the child blocks on a pipe
+    read. A real PTY fixes it — and one now exists on DESKTOP via node-pty,
+    but it must be rebuilt for Electron (needs VS Build Tools); without the
+    rebuild the /ide terminal shows an honest "unavailable" state. The web
+    /editor interactive path still uses the pipe runner. See memory.txt §7/D5.
+  • Live lint currently covers SYNTAX only. Deeper semantic linting
+    (e.g. pylint/checkstyle/cppcheck) is not wired.
+  • No "Problems" panel — markers only surface as squiggles + hover.
+  • Installer only supports winget + choco. Adding scoop/apt/brew would
+    extend detectPackageManager + a per-OS package-id map.
+  • Public Pages hero + About copy is admin-editable but the default
+    seeds live in client/src/content/siteContent.js — keep in sync with
+    server/src/config/siteContent.js.
+  • Piston public tier is whitelist-only; a self-hosted Piston is the
+    upgrade path if you need more languages.
+
+§13  HOW TO TAKE A LOOK IN 10 SECONDS
+--------------------------------------------------------------------------------
+  From a fresh shell:
+    cd e:\StackAmit-IDE
+    npm run dev
+  Then open the full IDE at http://localhost:5173/ide
+  (legacy single-file workspace still at /editor)
+  Or run the marketing pages: http://localhost:5173/ · /about · /contact
+  Admin: http://localhost:5173/login (credentials in server/.env).
+  Desktop (Electron) — needs the backend for execution, then:
+    cd client; npm run dev:electron     # or from root: npm run dev:desktop
+  Package a Windows installer:
+    cd client; npm run dist:win          # → client/release/*.exe
+
+§14  QUICK HEALTH PROBE (PowerShell)
+--------------------------------------------------------------------------------
+  Invoke-RestMethod http://localhost:5000/api/health
+  Invoke-RestMethod http://localhost:5000/api/interactive/status
+  $b = @{language='python';sourceCode='if True'} | ConvertTo-Json
+  Invoke-RestMethod 'http://localhost:5000/api/code/lint' `
+    -Method Post -Body $b -ContentType 'application/json'
+
+§15  WHAT'S CURRENTLY ON-DISK (verification screenshots)
+--------------------------------------------------------------------------------
+  python-syntax-error-squiggle.png   live-lint red squiggle on 'if True'
+  python-syntax-error-hover.png      same, hover tooltip visible
+  verify-home-header.png             public Home header (Logo+StackAmit+IDE)
+  verify-home-footer.png             public footer brand block (has IDE)
+  verify-about-header.png            About header
+  verify-about-footer.png            About footer
+
+  (These are throwaway evidence artifacts. Safe to delete any time.)
+================================================================================

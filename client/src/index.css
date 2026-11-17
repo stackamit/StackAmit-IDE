@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  @apply antialiased;
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* App shell background adapts to the active theme. */
+.app-shell {
+  @apply bg-slate-100 text-slate-800 dark:bg-ink-950 dark:text-slate-200;
+}
+
+/* Thin, unobtrusive scrollbars for the console and selects. */
+.scroll-slim::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.scroll-slim::-webkit-scrollbar-thumb {
+  @apply rounded-full bg-slate-300 dark:bg-ink-700;
+}
+.scroll-slim::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+.scroll-slim {
+  scrollbar-width: thin;
+}
+
+/* Focus ring consistent with the brand accent. */
+.focus-ring:focus-visible {
+  @apply outline-none ring-2 ring-brand-500/70 ring-offset-1 ring-offset-white dark:ring-offset-ink-950;
+}
+
+/* Todo Tree extension: line highlight + gutter marker for TODO/FIXME comments. */
+.ext-todo-line {
+  background: rgba(204, 167, 0, 0.1);
+}
+.ext-todo-glyph {
+  position: absolute;
+  width: 100%;
+  cursor: pointer;
+}
+.ext-todo-glyph::before {
+  content: '\25CF';
+  color: #cca700;
+  font-size: 10px;
+  line-height: inherit;
+  margin-left: 3px;
+}
+
+.stackamit-breakpoint {
+  position: relative;
+}
+.stackamit-breakpoint::before {
+  content: '';
+  display: block;
+  width: 9px;
+  height: 9px;
+  margin: 4px 0 0 4px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 5px rgb(239 68 68 / 60%);
+}
+.stackamit-breakpoint.verified::before { background: #22c55e; box-shadow: 0 0 5px rgb(34 197 94 / 60%); }
+.stackamit-current-line { background: rgb(59 130 246 / 14%); }
+
+/* Respect the system "reduce motion" preference. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

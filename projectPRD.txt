@@ -1,0 +1,289 @@
+================================================================================
+StackAmit-IDE — Product Requirements Document (PRD)
+--------------------------------------------------------------------------------
+Version   : 2.0
+Owner     : StackAmit (https://stackamit.netlify.app)
+Tagline   : Code. Compile. Create.
+Modes     : Web (browser) + Desktop (Electron) — one shared renderer
+Last edit : 19 October 2026
+================================================================================
+
+1. VISION & POSITIONING
+--------------------------------------------------------------------------------
+StackAmit-IDE is a fast, distraction-free compiler and code editor that runs in
+two modes from the SAME React renderer:
+  • Web mode  — in the browser: write, run and share Python, C, C++, Java and
+    JavaScript (Node.js). No setup, no sign-up, no downloads.
+  • Desktop mode — an Electron app with a real filesystem workspace and an
+    integrated terminal, behind a hardened IPC bridge.
+Both modes share the full-featured /ide shell (file explorer, multi-file
+Monaco tabs, bottom panel, command palette, themes).
+
+We target three overlapping audiences:
+  • Students writing their first program who can't afford to install toolchains.
+  • Interviewers / educators who want to check a snippet quickly in real time.
+  • Developers who want a scratchpad that opens instantly and works on any OS.
+
+Product pillars
+  P1. Zero-friction entry  — load the page, type, hit Run. Nothing to install.
+  P2. Real execution       — code actually runs on a real interpreter/compiler
+                              (never a simulation, never fake output).
+  P3. Editor that behaves  — Monaco (VS Code engine), live error highlighting,
+                              autosave drafts, sensible keyboard shortcuts.
+  P4. Interactive input    — programs that call input()/scanf/cin/Scanner can
+                              genuinely pause and wait for typed stdin.
+  P5. Local superpowers    — on our own dev machine, offer auto-install of
+                              missing toolchains (with consent) so interactive
+                              mode + live errors work for compiled languages.
+  P6. One codebase, two    — the same /ide shell ships as a website AND a
+      surfaces                 desktop app; only the storage/terminal layer
+                               differs (browser virtual FS vs Electron fs + PTY).
+
+2. TARGET USERS & JOBS-TO-BE-DONE
+--------------------------------------------------------------------------------
+U1. "I want to try a language without installing anything."
+    → Batch execution via Wandbox/Piston, 5 pre-configured languages.
+U2. "I want to write a Python/C++ program that reads multiple lines."
+    → Interactive terminal (WebSocket) streams stdin into a live child process.
+U3. "I want to catch syntax errors as I type, not after hitting Run."
+    → Live editor markers (Monaco native for JS/TS; local toolchain for
+      Python / C / C++ / Java via a debounced /api/code/lint call).
+U4. "I want to save my work to my own computer."
+    → Real Save button + Ctrl/⌘+S using the File System Access API
+      (showSaveFilePicker) with a browser-download fallback.
+U5. "I want to share a snippet with a colleague."
+    → Optional Snippets model + share-link (requires MongoDB).
+U6. "I want a dark/light editor I can leave open all day."
+    → Theme + font size + Monaco prefs persisted to localStorage.
+U7. "I want to run locally, and my machine is missing gcc/Java."
+    → Consent-driven installer popup → winget/choco → PATH refresh →
+      toolchain immediately usable for interactive + live lint.
+
+3. SCOPE
+--------------------------------------------------------------------------------
+In scope (v1.0)
+  • 5 languages: Python, C, C++, Java, JavaScript (Node.js) — all via a
+    single canonical registry (server/src/config/languages.js).
+  • Batch execution via Wandbox (default) or Piston (opt-in).
+  • Local interactive execution via WebSocket on the dev machine.
+  • Local syntax checking (live lint) using the installed toolchain.
+  • Consent-driven runtime installer using winget or choco.
+  • Real save-to-computer (File System Access API + Blob fallback).
+  • Share snippets (optional; requires MongoDB).
+  • Public marketing pages: Home / About / Contact with an admin inbox.
+  • Admin dashboard: usage stats, contact inbox, site content + settings.
+  • Site-wide banner + social links, editable by the admin.
+  • Dark / light themes, autosave drafts, keyboard shortcuts.
+  • Full /ide shell (web + desktop): VS Code-style activity bar, file explorer
+    (create/rename/delete/refresh), multi-file Monaco tabs with dirty
+    indicators + breadcrumbs, bottom panel (Terminal/Problems/Output), status
+    bar, top menu, command palette (F1) + quick-open (Ctrl+P), 3 themes.
+  • Bundled Monaco + language workers (NO CDN) — the editor works offline.
+  • Electron desktop app: real filesystem via authorized-root IPC guard, and an
+    integrated terminal via node-pty (optional native rebuild) with an honest
+    unavailable fallback in the browser.
+  • Storage abstraction: web = localStorage virtual FS + File System Access
+    import/save; desktop = validated window.stackamit IPC bridge.
+
+Out of scope (v1.0)
+  • Multi-user accounts (single admin only; public registration disabled).
+  • Persistent code storage on the server (only localStorage + optional
+    shareable snippets with a TTL).
+  • Sandboxed container isolation for local runs — local mode is intended
+    for the developer's own machine and is gated OFF in production unless
+    LOCAL_RUN_ENABLED=true is explicitly opted in.
+  • Package managers for end users (pip/npm installs).
+  • Mobile-optimised editing (works, but is not the primary surface).
+
+4. FUNCTIONAL REQUIREMENTS
+--------------------------------------------------------------------------------
+FR-1   Editor
+  FR-1.1  Monaco with syntax highlighting, bracket-pair colorization,
+          folding, word wrap, automatic layout.
+  FR-1.2  Font size selector (12/14/16/18/20/22) persisted to localStorage.
+  FR-1.3  Theme toggle (light ↔ dark) persisted; Monaco uses 'vs-dark'/'light'.
+  FR-1.4  Family (JetBrains Mono / Fira Code / etc.), minimap, line numbers,
+          tab size, ligatures — all editable in the Settings modal.
+
+FR-2   Language switching
+  FR-2.1  Dropdown lists all supported languages with their label + version.
+  FR-2.2  Each language has its own draft slot in localStorage (key
+          'stackamit:drafts' — object keyed by languageKey).
+  FR-2.3  Switching language preserves the previous draft; the new language
+          either loads its stored draft or a starter template.
+
+FR-3   Execution (Batch mode)
+  FR-3.1  Ctrl/⌘+Enter runs the current buffer.
+  FR-3.2  The user can pre-queue multiple stdin lines before running.
+  FR-3.3  Result shows stdout, stderr, exit code, compile diagnostics.
+  FR-3.4  Long output is capped (env.maxOutputBytes = 64 KiB).
+  FR-3.5  Rate-limited application-side (env.rateMax ≈ 10/min).
+
+FR-4   Execution (Interactive mode, local)
+  FR-4.1  Toggle Batch/Interactive in the terminal toolbar.
+  FR-4.2  Programs using input()/scanf/cin/Scanner genuinely pause and wait
+          for the user's keystrokes streamed via WebSocket to a live child.
+  FR-4.3  Compiled languages (C/C++/Java) auto-compile then run; the compile
+          stream is shown separately from stdout/stderr.
+  FR-4.4  Idle sessions are reaped after INTERACTIVE_IDLE_TIMEOUT_MS (default
+          120 000 ms) to bound resources.
+  FR-4.5  Concurrent sessions bounded by MAX_CONCURRENT_EXECUTIONS.
+
+FR-5   Live error highlighting (as-you-type)
+  FR-5.1  JavaScript/TypeScript validated in-browser by Monaco natively.
+  FR-5.2  Python/C/C++/Java syntax-checked by the local toolchain
+          (py_compile / gcc -fsyntax-only / g++ / javac) via
+          POST /api/code/lint. Result is painted as Monaco markers with
+          severity Error/Warning at the exact line + column.
+  FR-5.3  Debounced ~700 ms after the last keystroke; cancels stale results.
+  FR-5.4  Missing runtime → endpoint returns linted:false, no crash.
+
+FR-6   Save & Share
+  FR-6.1  Save button in the IDE navbar + Ctrl/⌘+S writes a real file
+          (main.py / main.c / main.cpp / Main.java / main.js) to disk via
+          the File System Access API, falling back to a browser download.
+  FR-6.2  Every keystroke also autosaves to localStorage (drafts).
+  FR-6.3  "Share" copies a short URL to /snippet/:id (needs MongoDB).
+
+FR-7   Missing-runtime auto-install (consent popup)
+  FR-7.1  Clicking the "no local runtime · install" badge (or triggering a
+          run when no toolchain exists) opens a modal describing the exact
+          command that will be run (winget or choco).
+  FR-7.2  The user explicitly clicks Install to give consent; UAC is the
+          real permission gate — the app never elevates silently.
+  FR-7.3  Progress (installer stdout/stderr) streams back over the same
+          WebSocket and is shown live in the popup log.
+  FR-7.4  After completion the server refreshes PATH from the Windows
+          registry AND scans known toolchain folders, then re-detects —
+          so the tool becomes usable in the IDE without a restart.
+
+FR-8   Public marketing pages
+  FR-8.1  / Home, /about About, /contact Contact.
+  FR-8.2  SiteHeader brand = Logo + "StackAmit" + IDE badge (badge outside
+          the anchor). Nav = Home / About / Contact / StackAmit ↗ / Launch IDE.
+          The StackAmit nav item uses a globe icon + ArrowUpRight and its
+          visible label is "StackAmit" — never a raw URL.
+  FR-8.3  SiteFooter brand block also shows the IDE badge + description.
+
+FR-9   Admin dashboard
+  FR-9.1  Single admin (env.ADMIN_USERNAME / env.ADMIN_PASSWORD), JWT session.
+  FR-9.2  Views: usage stats (ExecutionLog), contact inbox, editable site
+          content (Home/About/Contact copy, hero, features, social links),
+          announcement banner toggle, snippet availability toggle.
+  FR-9.3  No public registration.
+
+FR-10  Snippets (optional)
+  FR-10.1 Save language + source + optional stdin + isPublic + TTL days.
+  FR-10.2 Read by short id at /snippet/:id; renders read-only editor.
+  FR-10.3 Falls back gracefully if MongoDB is not configured.
+
+FR-11  Full IDE shell (/ide) — shared by web + desktop
+  FR-11.1 Activity bar switches sidebar views (Explorer / Search / Settings).
+  FR-11.2 File explorer lists the workspace and supports create file/folder,
+          rename (F2), delete (with non-empty guard) and refresh.
+  FR-11.3 Multi-file editor: one Monaco model per open document, tabbed, with
+          dirty dots, close-confirm on unsaved changes, and breadcrumbs.
+  FR-11.4 Bottom panel with Terminal / Problems / Output tabs; Problems shows
+          live-lint markers, Output shows Run results.
+  FR-11.5 Command palette (F1 / Ctrl+Shift+P) and quick-open (Ctrl+P); global
+          shortcuts (Ctrl+S save, Ctrl+Shift+S save-as, Ctrl+N new, Ctrl+B
+          toggle sidebar, Ctrl+J toggle panel, Ctrl+Enter run).
+  FR-11.6 Right AI-chat panel is an honest placeholder — no fabricated answers.
+
+FR-12  Desktop app (Electron)
+  FR-12.1 Same renderer loaded over file:// in production (HashRouter) and the
+          Vite dev server in development (ELECTRON_START_URL).
+  FR-12.2 Renderer is sandboxed: contextIsolation on, nodeIntegration off,
+          restrictive CSP; OS access only through the preload bridge.
+  FR-12.3 Filesystem ops validate the sender origin and confine every path to
+          an authorized root (added only via native Open/Save dialogs), with
+          realpath canonicalization blocking .. traversal + symlink escape.
+  FR-12.4 Integrated terminal spawns the system shell via node-pty and streams
+          I/O to xterm.js; if node-pty is not built for Electron the panel
+          shows an honest "unavailable" state and the rest still works.
+  FR-12.5 Windows packaging via electron-builder (NSIS installer).
+
+5. NON-FUNCTIONAL REQUIREMENTS
+--------------------------------------------------------------------------------
+NFR-1  Performance
+  • First paint of the marketing pages < 1.5 s on mid-tier hardware.
+  • Editor ready (Monaco loaded, code visible) < 2 s.
+  • Batch run round-trip ≈ provider latency + 200 ms of our overhead.
+  • Interactive keystroke → child stdin ≈ < 30 ms over local WS.
+  • Live lint debounced to ≈ 1 req/700 ms of idle; local check ≤ 4 s hard cap.
+
+NFR-2  Security & privacy
+  • Helmet, CORS allow-list, express-rate-limit on every mutating endpoint.
+  • Source code and stdin are NEVER persisted on the server (only non-
+    sensitive ExecutionLog metadata: language, provider, exit code, bytes).
+  • Local interactive is OFF in production unless LOCAL_RUN_ENABLED=true.
+  • WebSocket upgrade checks Origin against an allow-list.
+  • Admin password compared with constant-time; JWT HS256 with a secret
+    from env; no cookies — Authorization header bearer only.
+  • Installer runs an allow-list of package ids only (winget --id / choco
+    name); user sees the exact command before agreeing.
+
+NFR-3  Reliability
+  • Missing DB degrades gracefully (snippet routes return 503).
+  • Missing provider returns 200 with success:false and a clear message.
+  • EADDRINUSE on boot logs a one-line fatal and exits (no stack trace).
+  • `node --watch --watch-path=src` so node_modules edits don't restart the
+    server; Vite + API survive npm activity elsewhere.
+
+NFR-4  Observability
+  • pino + pino-http structured logs; /api/health excluded from auto-logging.
+  • ExecutionLog persisted per run for admin usage stats.
+
+NFR-5  Compatibility
+  • Evergreen Chrome / Edge / Firefox / Safari (last 2 majors).
+  • File System Access API for Save (Chrome/Edge); download fallback elsewhere.
+  • Windows primary dev target (winget/choco installer path); POSIX runners
+    also work for the local Python/Node interactive path.
+
+NFR-6  Localizability / maintainability
+  • Single canonical language registry (server/src/config/languages.js).
+    Adding a language = adding one object there; editor + selector + both
+    provider adapters derive everything from it.
+  • Zod validators at the request boundary.
+  • All user-facing copy for public pages editable from the admin.
+
+6. SUCCESS METRICS (post-launch tracking)
+--------------------------------------------------------------------------------
+  • Time-to-first-run from cold page load (target < 15 s).
+  • Runs / visitor (target ≥ 2.5).
+  • Interactive mode adoption vs Batch (target ≥ 30 % of dev-machine sessions).
+  • Live-error markers produced per session (proxy for typing volume).
+  • Save-to-computer clicks per session.
+  • Installer completion rate (started vs succeeded).
+
+7. MILESTONES / RELEASE HISTORY (relevant to v1.0)
+--------------------------------------------------------------------------------
+  M1 · Core IDE — Monaco, batch execution via Wandbox, localStorage drafts,
+      5 languages.
+  M2 · Public marketing site + admin dashboard (contact inbox, banner,
+      social, editable copy).
+  M3 · Interactive terminal (WebSocket-backed local child processes) with
+      Batch/Interactive toggle; per-language runtime detection; UI gating.
+  M4 · Consent-driven runtime installer (winget/choco, PATH refresh from
+      registry, known-folder scan → auto-augment PATH for the IDE).
+  M5 · Live error highlighting (as-you-type) for Python/C/C++/Java via
+      local toolchain + Monaco markers.
+  M6 · Real save-to-computer (File System Access API + download fallback);
+      footer simplified to keyboard hints; SiteHeader/Footer badge fixes.
+  M7 · Full /ide shell (activity bar, explorer, multi-file tabs, bottom panel,
+      command palette, 3 themes) shared by web + Electron desktop; bundled
+      Monaco workers (no CDN); storage abstraction; secure IPC fs + node-pty
+      terminal with fallback; electron-builder Windows packaging.
+
+8. OPEN ITEMS / FUTURE WORK
+--------------------------------------------------------------------------------
+  • PTY support now exists on DESKTOP via node-pty — but it must be rebuilt
+    against Electron's ABI (`npm run rebuild`) with VS Build Tools; when the
+    native build is absent the terminal honestly degrades to "unavailable".
+    The server batch/interactive runners still use the pipe-based path.
+  • Add a "problems panel" that lists all live-lint markers (currently we
+    only show squiggles).
+  • Server-side Wandbox/Piston-based lint fallback when local runtime is
+    absent (currently skipped to avoid provider cost / rate-limit pressure).
+  • Per-user cloud drafts (needs auth beyond admin).
+================================================================================

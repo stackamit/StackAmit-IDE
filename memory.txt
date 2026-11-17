@@ -1,0 +1,543 @@
+================================================================================
+StackAmit-IDE — Project Memory
+--------------------------------------------------------------------------------
+Durable, verified facts and past decisions. Read this BEFORE touching code.
+Updated: 21 October 2026 (language-support expansion)
+================================================================================
+
+§1  HIGH-LEVEL PROJECT SUMMARY
+--------------------------------------------------------------------------------
+StackAmit-IDE is a MERN online compiler AND an Electron desktop IDE.
+  Front : Vite 5 + React 18 + React Router 6 + Monaco (bundled, no CDN) +
+          Tailwind 3 + Zustand + @xterm/xterm.
+  Desk  : Electron 33 + TypeScript main/preload/services (esbuild → CJS),
+          contextBridge IPC, node-pty (optional native), electron-builder.
+  Back  : Node ESM + Express 4 + Mongoose 8 (optional) + Zod + Helmet +
+          express-rate-limit + pino + ws (WebSocket) + JWT (admin only).
+  Comms : The browser/renderer only ever talks to OUR API for execution. Never
+          directly to Wandbox or Piston — the server is a strict proxy +
+          validator + rate limiter.
+  Modes : Web and Desktop share ONE renderer; a storage/terminal abstraction
+          (client/src/services/workspace.js) picks the provider at runtime from
+          the presence of window.stackamit.
+  Repo  : monorepo — root, /client (web + Electron), /server. Root scripts
+          orchestrate.
+
+§2  TECH STACK & VERSIONS (from package.json)
+--------------------------------------------------------------------------------
+Root
+  concurrently ^9.1.0        (runs dev:server + dev:client together)
+
+Client dependencies
+  @monaco-editor/react ^4.6.0
+  @xterm/addon-fit ^0.10.0
+  @xterm/addon-web-links ^0.11.0
+  @xterm/xterm ^5.5.0
+  axios ^1.7.7
+  lucide-react ^0.451.0
+  monaco-editor ^0.52.2         (bundled locally — NOT from a CDN)
+  node-pty ^1.1.0               (DESKTOP terminal; optional, needs rebuild)
+  react ^18.3.1
+  react-dom ^18.3.1
+  react-router-dom ^6.26.2
+  zustand ^5.0.2                (/ide state)
+
+Client devDependencies
+  @electron/rebuild ^3.6.0
+  @testing-library/jest-dom ^6.5.0
+  @testing-library/react ^16.0.1
+  @types/node ^20.16.11
+  @vitejs/plugin-react ^4.3.2
+  autoprefixer ^10.4.20
+  cross-env ^7.0.3
+  electron ^33.2.0
+  electron-builder ^24.13.3
+  esbuild ^0.21.5               (bundles electron TS → CJS)
+  jsdom ^25.0.1
+  postcss ^8.4.47
+  tailwindcss ^3.4.13
+  typescript ^5.6.3
+  vite ^5.4.8
+  vitest ^2.1.2
+  wait-on ^8.0.1
+
+  allowScripts (this env blocks postinstall by default; these are approved):
+    electron, esbuild, node-pty, @electron/rebuild.
+  node-pty is listed but its Electron-ABI build only succeeds with VS Build
+  Tools; without it the terminal falls back to an honest unavailable state.
+
+Server dependencies
+  cors ^2.8.5
+  cross-env ^7.0.3
+  dotenv ^16.4.5
+  express ^4.21.1
+  express-rate-limit ^7.4.1
+  helmet ^8.0.0
+  jsonwebtoken ^9.0.2
+  mongoose ^8.8.0
+  pino ^9.5.0
+  pino-http ^10.3.0
+  ws ^8.18.0
+  zod ^3.23.8
+
+Engines: Node >= 18 (dev machine runs Node 24.20.0).
+
+§3  DIRECTORY MAP (top-level, source only)
+--------------------------------------------------------------------------------
+e:\StackAmit-IDE\
+  package.json            root scripts (dev, build, test, install:all)
+  README.md
+  client\
+    index.html
+    package.json          "main"=electron/dist/main.cjs + electron-builder
+                          "build" config (NSIS win, asarUnpack node-pty)
+    vite.config.js        base './'; proxies /api to :5000 (ws:true);
+                          manualChunks monaco/xterm; worker format es; vitest
+    tailwind.config.js    (darkMode: 'class')
+    public\logo.jpg       favicon.svg
+    scripts\
+      build-electron.mjs  esbuild: electron TS main/preload -> CJS
+      dev-electron.mjs    build + start Vite + wait + launch Electron
+    electron\             (TypeScript; built to electron\dist\*.cjs)
+      main.ts             BrowserWindow, CSP, navigation hardening
+      preload.ts          contextBridge -> window.stackamit
+      ipc.ts              handlers with sender-origin validation
+      shared\ipc.ts       channel names + Result<T> envelopes
+      services\workspaceFs.ts   authorized-root fs + realpath traversal guard
+      services\terminal.ts      node-pty (lazy) + PTY_UNAVAILABLE fallback
+    src\
+      App.jsx             BrowserRouter (web) / HashRouter (desktop); routes:
+                          /, /about, /contact, /editor, /ide, /snippet/:id,
+                          /login, /admin (protected). Desktop '/' -> /ide.
+      monaco\             monacoSetup.js (bundled workers, no CDN) · themes.js
+      services\api.js     axios client + interactiveStatus/lint/saveSnippet
+      services\workspace.js  storage abstraction: WebProvider (localStorage
+                          virtual FS + File System Access) vs DesktopProvider
+                          (window.stackamit bridge). Exports `workspace`.
+      store\ideStore.js   Zustand: docs/order/activePath, layout, problems,
+                          output, themeId, tree actions
+      pages\              IdeApp.jsx (full-screen /ide wrapper), Workspace.jsx
+                          (legacy single-file IDE), Home, About, Contact, Login,
+                          SnippetView, AdminDashboard
+      components\
+        ide\              IdeShell · ActivityBar · SidebarView · FileExplorer ·
+                          EditorTabs · MonacoHost · BottomPanel · TerminalPanel
+                          (xterm) · StatusBar · TopMenu · CommandOverlay ·
+                          AiChatPanel · Resizer · LanguageCatalogue (capability
+                          browser with All/Online/Local/Preview/Setup filters)
+        layout\           Navbar (IDE) · SiteHeader/SiteFooter (public) ·
+                          Footer (IDE keyboard hints only) · Splitter ·
+                          PublicLayout
+        editor\           CodeEditor.jsx (Monaco wrapper), EditorSettings,
+                          LanguageSelector
+        console\          Terminal.jsx (batch + interactive + WS + install
+                          trigger)
+        ui\               Logo.jsx · Button.jsx · Notification.jsx ·
+                          RuntimeInstallModal.jsx · SocialLinks.jsx
+        ProtectedRoute.jsx
+      hooks\              useLocalStorage · useTheme · useEditorPrefs ·
+                          useSiteContent · useIdeActions · useIdeTheme
+      utils\              languageDefaults.js (derived from the registry) ·
+                          langForFile.js (ext -> Monaco language + backend run
+                          key) · monacoModels · fileIcons · webPreview
+      languages\          languageCapabilities.js (64-entry source of truth) ·
+                          customLanguages.js (16 Monarch grammars) ·
+                          snippets.js (22 languages of real Monaco completions)
+      content\siteContent.js  default marketing copy seeds
+  server\
+    src\
+      server.js           EADDRINUSE handler + attachInteractiveServer
+      app.js              helmet, cors, body limit, pino-http, routes
+      config\
+        env.js            all env vars w/ sane defaults (see §5)
+        languages.js      batch-runner registry (18 runners, Oct 2026)
+        db.js             mongoose connect + isDatabaseConnected
+        auth.js           JWT helpers for admin
+        logger.js         pino config + redaction
+        executionProvider.js  picks wandbox|piston from env
+        siteContent.js    default marketing content served by /api/site/*
+      controllers\        code.controller (run + lint) · admin.controller ·
+                          health.controller · language.controller ·
+                          site.controller · snippet.controller
+      routes\             code.routes (/code/run + /code/lint) ·
+                          interactive.routes (/status, /install/plan/:lang) ·
+                          admin · language · snippet · site · health
+      middleware\         rateLimiter (execution/api/lint/login/contact) ·
+                          errorHandler · requireAdmin
+      services\
+        execution.service.js   provider-agnostic batch runner
+        providers\wandboxProvider.js   Piston/Wandbox adapters
+        providers\pistonProvider.js
+        providers\http.js                shared axios + retry helper
+        interactive.service.js   WebSocket local child processes + install
+        lint.service.js          py_compile / gcc -fsyntax-only / javac
+        runtimes.js              detectRuntimes (22 toolchain probes incl.
+                                 gcc/g++/java/go/rustc/dotnet/php/ruby/perl/lua/
+                                 julia/runghc/fpc/bash/pwsh) with cache
+        runtimeInstaller.js      winget/choco + PATH refresh + known scan
+        content.service.js    · settings.service.js
+      models\             Snippet · ExecutionLog · ContactMessage ·
+                          Settings · SiteContent
+      validators\         code.validator.js (Zod)
+      utils\              ApiError.js
+    tests\                admin · errors · health · run · languages ·
+                          languagesPiston · interactive · integration
+                          (node --test; integration gated by RUN_INTEGRATION=1)
+
+§4  LANGUAGE REGISTRIES (two layers, deliberately separate)
+--------------------------------------------------------------------------------
+SERVER  server/src/config/languages.js — only languages the BATCH provider can
+run. Each entry: key, label, monaco id, fileName, starter, piston, wandbox.
+18 keys (every one ran a real program through the live provider 2026-10-21):
+  python c cpp java javascript typescript go rust csharp php ruby perl lua
+  julia haskell sql shell pascal
+Languages whose provider images were broken during that probe (Swift, Elixir,
+Erlang, OCaml, Scala, Mono/VB) are deliberately NOT registered as runners.
+
+CLIENT  client/src/languages/languageCapabilities.js — the single source of
+truth for the EDITOR: 64 entries / 61 Monaco ids. Per entry: id, monaco, label,
+extensions, filenames, grammar ('service'|'bundled'|'monarch'|'none'),
+intellisense ('language-service'|'basic'), features list, snippets, run (server
+key or null), local {cmd, install winget id, note}, formatter, linter, preview,
+lsServer (candidate only, never claimed), variantOf (JSX/TSX/SVG are documented
+editor modes, not extra languages). Editor, file detection, selector, Run menu,
+LanguageCatalogue, status bar, snippets and languageDefaults all read it — no
+scattered hardcoded arrays. client/src/languages/customLanguages.js holds the 16
+custom Monarch grammars for formats Monaco 0.52 does not ship (matlab, groovy,
+erlang, haskell, ocaml, fortran, cobol, asm, vue, svelte, astro, toml, nginx,
+wat, makefile, plsql) and is verified against REAL monaco-editor tokenization in
+client/src/languages/__tests__/monacoGrammars.test.js.
+
+Java starter deliberately uses `class Main` (package-private) so the same
+snippet compiles whether the provider names the file Main.java (Piston) or
+prog.java (Wandbox).
+
+Monaco's own ids to remember: Solidity is `sol`, Protocol Buffers is `proto`
+(claiming 'solidity'/'protobuf' silently yields plain text — the real-Monaco
+test catches it).
+
+Adding a language: add ONE entry in the client registry; if it is executable
+remotely, add the matching key to server/src/config/languages.js AND mirror it in
+interactive.service.js PLANS + runtimes.js RUNTIME_PROBES when a single-file
+local flow exists. Tests pin the parity between those layers in both directions.
+
+§5  ENVIRONMENT VARIABLES (server/src/config/env.js)
+--------------------------------------------------------------------------------
+Core
+  NODE_ENV                 development|production
+  PORT                     default 5000
+  CLIENT_URL               default http://localhost:5173  (CORS allow-list)
+  MONGODB_URI              empty = optional; snippet routes return 503
+  LOG_LEVEL                pino level (default 'info')
+
+Execution provider
+  EXECUTION_PROVIDER       'wandbox' (default) | 'piston'
+  WANDBOX_API_URL          default https://wandbox.org/api
+  WANDBOX_COMPILE_PATH     default /compile.json
+  WANDBOX_LIST_PATH        default /list.json
+  PISTON_API_URL           default https://emkc.org/api/v2/piston
+  PISTON_RUN_PATH          default /execute
+  PISTON_RUNTIMES_PATH     default /runtimes
+  EXECUTION_API_KEY        for self-hosted Piston
+  EXECUTION_API_KEY_HEADER e.g. 'X-Api-Key'
+  EXECUTION_TIMEOUT_MS     default 15000
+
+Application limits
+  MAX_SOURCE_BYTES             65536
+  MAX_STDIN_BYTES              16384
+  MAX_OUTPUT_BYTES             65536
+  EXECUTION_RATE_LIMIT_WINDOW_MS  60000
+  EXECUTION_RATE_LIMIT_MAX     10
+  MAX_CONCURRENT_EXECUTIONS    3
+
+Local interactive + lint
+  LOCAL_RUN_ENABLED        default: true in dev, false in production
+  INTERACTIVE_IDLE_TIMEOUT_MS  default 120000
+  LINT_TIMEOUT_MS          default 4000
+
+Snippets
+  SNIPPET_ENABLED          default true (but requires DB connection)
+  SNIPPET_DEFAULT_TTL_DAYS default 30
+  SNIPPET_MAX_CODE_BYTES   default 65536
+
+Admin
+  ADMIN_USERNAME · ADMIN_PASSWORD · ADMIN_JWT_SECRET · ADMIN_TOKEN_TTL_HOURS(12)
+
+Client build-time (Vite reads VITE_*)
+  VITE_API_URL             empty ⇒ relative '/api' via dev proxy
+  (Terminal/RuntimeInstallModal fall back to window.location for WS base)
+
+§6  DEV COMMANDS (Windows PowerShell — DO NOT use &&)
+--------------------------------------------------------------------------------
+Install everything once:
+  npm run install:all
+Run full dev stack (server :5000 + Vite :5173):
+  npm run dev
+Server only:
+  cd server; npm.cmd run dev    # node --watch --watch-path=src src/server.js
+Client only:
+  cd client; npm.cmd run dev    # vite
+Client tests:
+  cd client; npm.cmd test -- --run
+Server tests:
+  cd server; npm.cmd test       # node --test
+Client production build:
+  cd client; npm.cmd run build
+Desktop (Electron) — in /client unless noted:
+  cd client; npm.cmd run dev:electron   # build main/preload + Vite + launch Electron
+  npm run dev:desktop                    # root wrapper for the above
+  cd client; npm.cmd run build:electron # esbuild TS -> electron/dist/*.cjs
+  cd client; npm.cmd run typecheck:electron # tsc --noEmit over electron TS
+  cd client; npm.cmd run rebuild         # node-pty for Electron ABI (needs VS Build Tools)
+  cd client; npm.cmd run dist:win        # vite build + typecheck + electron build + NSIS
+  npm run dist:win                        # root wrapper
+  npm run build:desktop                   # root -> client build:electron
+Server production start:
+  cd server; npm.cmd run start  # cross-env NODE_ENV=production node ...
+
+Notes for Windows sandbox:
+  • PowerShell rejects '&&' — use ';'.
+  • Invoke npm as `npm.cmd` (bare `npm` can fail in constrained shells).
+  • taskkill/node/npm on non-spawned processes often need elevated perms.
+
+§7  KEY ARCHITECTURAL DECISIONS
+--------------------------------------------------------------------------------
+D1  Batch vs Interactive split
+    Providers (Wandbox / Piston) are request/response and CANNOT pause on
+    input(). For "type when input() is called" we launch a real child process
+    on the server and stream stdin/stdout over a WebSocket at
+    /api/interactive (Vite proxies with ws:true). This is gated behind
+    LOCAL_RUN_ENABLED and only works where a toolchain is present.
+
+D2  Runtime auto-install is consent-driven, not silent
+    Popup shows the exact command (e.g. `winget install --id
+    BrechtSanders.WinLibs.POSIX.UCRT -e`). Windows UAC is the real permission
+    gate. After the installer exits we (a) re-read Machine+User PATH from the
+    registry via PowerShell, then (b) scan known toolchain folders
+    (msys64/*, mingw64, Program Files JDKs, WinGet packages, LLVM, chocolatey
+    bin, Python install dirs, etc.) and prepend any found bin to
+    process.env.PATH. detectRuntimes is then re-run so the IDE can use the
+    toolchain WITHOUT a restart.
+
+D3  Live error highlighting is local-only
+    py_compile / gcc -fsyntax-only / g++ -fsyntax-only / javac on the same
+    server that hosts interactive runs. No provider cost, no rate-limit
+    pressure. JavaScript/TypeScript are validated natively by Monaco, so we
+    skip the server path for them. When no runtime exists we return
+    linted:false with an empty marker array — no red squiggles, no crash.
+
+D4  Save = File System Access API with a Blob download fallback
+    showSaveFilePicker → createWritable → close. On unsupported browsers we
+    build a Blob and click a temporary <a download>. Suggested filename is
+    lang.fileName (main.py, main.c, main.cpp, Main.java, main.js). localStorage
+    autosave (drafts) is separate and happens on every keystroke.
+
+D5  node-pty is an OPTIONAL desktop dependency (stance revised)
+    Earlier the project rejected node-pty entirely because its Electron-ABI
+    build needs a native toolchain. Now the DESKTOP app ships node-pty for the
+    integrated terminal, but loaded lazily in electron/services/terminal.ts:
+    require('node-pty') is attempted and, on any failure (missing VS Build
+    Tools / no rebuild), create() returns a structured { ok:false,
+    code:'PTY_UNAVAILABLE' } and the renderer shows an honest "terminal
+    unavailable" state. The SERVER batch/interactive runners still use the
+    pipe-based path (never node-pty), so compiled-language prompt-flush caveat
+    for printf-without-newline remains for the server interactive path only.
+    To enable the real PTY: cd client; npm run rebuild (needs VS Build Tools).
+
+D6  EADDRINUSE hardening
+    server.js registers a 'server.on("error")' handler that logs a friendly
+    fatal and exits — no unhandled stack trace. Also dev script uses
+    `node --watch --watch-path=src` so node_modules edits (which previously
+    triggered restarts) no longer do.
+
+D7  Provider default = Wandbox
+    Piston public API is whitelist-only (a small fixed language list).
+    Wandbox has broader language coverage and no key required, so it is
+    the default. Set EXECUTION_PROVIDER=piston if using a self-hosted
+    Piston. Piston integration tests are gated (skip when no reachable
+    instance).
+
+D8  Terminal stdin heuristic
+    We detect common stdin idioms across languages via regex (input(,
+    raw_input(, sys.stdin, scanf, getchar, fgets, std::cin, cin<<,
+    Scanner, readLine, BufferedReader, System.console, readline, prompt,
+    stdin) and nudge the user to queue input BEFORE running — never block.
+
+D9  Public site branding consistency rule
+    Any "StackAmit" wordmark that is a product logo must show the small
+    "IDE" badge beside it. The badge is a sibling <span>, NOT inside the
+    <a href=COMPANY_URL>. Nav-level link to the company site is labelled
+    "StackAmit" with a Globe icon + ArrowUpRight — never the raw URL.
+
+D10 Footer minimalism
+    The IDE Footer (bottom of /editor) is just keyboard hints right-aligned:
+    Ctrl+Enter run · Ctrl+S save file · Ctrl+Shift+F format. No brand,
+    no links. The public marketing SiteFooter is a separate component and
+    keeps the full brand block.
+
+D11 One renderer, two modes via storage abstraction
+    /ide (client/src/pages/IdeApp.jsx + components/ide/*) is the SAME React
+    code in web and Electron. client/src/services/workspace.js exports a single
+    `workspace` chosen at runtime by isDesktopMode() (presence of
+    window.stackamit). WebProvider = localStorage virtual FS + File System
+    Access import/save + terminal:null. DesktopProvider = the IPC bridge.
+    Callers treat paths as opaque strings and never throw (structured { ok }).
+
+D12 Monaco is bundled, never CDN
+    client/src/monaco/monacoSetup.js registers workers via Vite `?worker`
+    imports + MonacoEnvironment.getWorker and loader.config({ monaco }); it is
+    imported first in main.jsx. vite.config base './' + worker format es so
+    Electron can load them over file://. Production build emits discrete
+    editor/json/html/css/ts worker chunks — no cdn.jsdelivr.net anywhere.
+
+D13 Electron security model (non-negotiable)
+    BrowserWindow: contextIsolation:true, nodeIntegration:false, sandbox:true;
+    preload exposes ONLY window.stackamit via contextBridge. Every IPC handler
+    validates the sender frame origin against trustedOrigins (dev http origin,
+    prod file:// index) and returns UNTRUSTED_SENDER otherwise. fs is confined
+    to authorized roots added only through native Open/Save dialogs; each path
+    is realpath-canonicalized so .. traversal + symlink escape are rejected.
+    A restrictive CSP is applied onHeadersReceived; will-navigate/setWindowOpen-
+    Handler deny off-origin navigation and route http(s) to shell.openExternal.
+
+D14 HashRouter on desktop
+    Electron loads dist/index.html over file://, where history routing breaks on
+    reload. App.jsx uses HashRouter when isDesktopMode() and BrowserRouter on
+    web; the desktop root redirect is '/' -> /ide.
+
+D15 Packaging without elevation
+    electron-builder win.signAndEditExecutable is set false so --dir and NSIS
+    packaging succeed WITHOUT extracting winCodeSign.7z (its macOS dylib
+    symlinks need admin/Developer Mode on Windows → "A required privilege is
+    not held" error). Trade-off: default Electron icon, no code signature. To
+    brand/sign, enable Developer Mode or run elevated, add build/icon.ico, set
+    win.icon and re-enable signAndEditExecutable.
+
+§8  IMPLEMENTATION-PITFALL LIBRARY (each is a real, resolved incident)
+--------------------------------------------------------------------------------
+P-01  Bug class: unhandled 'error' event on port bind.
+      Root cause: stale node --watch supervisors from prior sessions still
+                   held :5000, and node_modules churn (has-flag etc.) kept
+                   restarting the server.
+      Fix pattern: server.on('error') handler with a clean EADDRINUSE
+                   message; --watch-path=src so node_modules doesn't
+                   trigger restarts.
+      Reusable: whenever you listen() on a fixed port, register an error
+                handler on the returned server object.
+
+P-02  Bug class: postinstall blocked by allowScripts policy.
+      Root cause: node-pty's prebuild copy step is a native build script.
+      Fix pattern: rejected PTY; used pipe-based runner with documented
+                   flush caveat. If a PTY is later required, whitelist
+                   the postinstall script explicitly.
+
+P-03  Bug class: Piston public API rejects non-whitelisted languages.
+      Root cause: the public https://emkc.org/api/v2/piston only accepts
+                   a fixed language set (no arbitrary versions).
+      Fix pattern: default provider = Wandbox; Piston only as opt-in
+                   pointing at a self-hosted instance.
+
+P-04  Bug class: PATH not refreshed after winget/choco install.
+      Root cause: registry PATH update happens in a subprocess the Node
+                   process doesn't inherit.
+      Fix pattern: execFile powershell reading Machine + User PATH, then
+                   assign process.env.PATH AND process.env.Path (Windows
+                   env vars are case-insensitive but Node caches both).
+                   Also scan known folders as a safety net.
+
+P-05  Bug class: Monaco native JS/TS diagnostics duplicate our server lint.
+      Root cause: both write markers.
+      Fix pattern: our server lint targets ONLY python/c/cpp/java; Monaco
+                   keeps JS/TS. Different marker 'owner' ids ('stackamit-
+                   lint' vs Monaco's defaults) also prevent collisions.
+
+P-06  Bug class: `foreach ($pid in ...)` in PowerShell silently fails.
+      Root cause: $pid is a reserved read-only automatic variable.
+      Fix pattern: rename loop vars to $procId.
+
+P-07  Bug class: interactive.routes.js broken import after refactor.
+      Root cause: moved detectRuntimes from interactive.service.js into
+                   a new runtimes.js but forgot to update the route.
+      Fix pattern: after extracting detection, grep for old import paths
+                   before restarting.
+
+P-08  Bug class: "Access is denied" for taskkill / node / npm in sandbox.
+      Root cause: sandbox can only manage processes it spawned.
+      Fix pattern: request required_permissions='all' for cleanup scripts
+                   when the process was started outside this session.
+
+P-09  Bug class: Vite silently falls back to :5175 because orphan Vite
+                   processes hold :5173/:5174.
+      Root cause: dev restarts left prior Vites alive.
+      Fix pattern: kill all node/concurrently/Vite processes and re-check
+                   with Get-NetTCPConnection -LocalPort 5173,5174,5000.
+
+P-10  Bug class: "showSaveFilePicker" user-cancel handled as failure.
+      Root cause: AbortError thrown when the dialog is dismissed.
+      Fix pattern: swallow AbortError silently; only fall back to Blob
+                   download for OTHER exceptions.
+
+P-11  Bug class: electron-builder fails extracting winCodeSign.7z.
+      Symptom: "Cannot create symbolic link : A required privilege is not
+               held by the client" on darwin/*.dylib during --win packaging.
+      Root cause: the winCodeSign tool package ships macOS symlinks; Windows
+               only extracts them with admin rights or Developer Mode.
+      Fix pattern: set win.signAndEditExecutable=false (skips rcedit/signing,
+               so winCodeSign is never downloaded). Re-enable only under an
+               elevated/Developer-Mode shell when you need a custom icon/sig.
+
+P-12  Bug class: esbuild rejects outdir + outfile together.
+      Root cause: build-electron.mjs passed outdir/outbase AND outfile.
+      Fix pattern: one entry -> one outfile per build call (main.cjs,
+               preload.cjs); drop outdir/outbase when using outfile.
+
+P-13  Bug class: Electron main.ts crashes as CJS using import.meta.url.
+      Root cause: esbuild bundles to format:'cjs' where import.meta is invalid.
+      Fix pattern: use __dirname (CJS) to resolve dist paths; mark electron +
+               node-pty external so they aren't bundled.
+
+P-14  Bug class: Zustand action hook re-rendered the whole IDE shell.
+      Root cause: useIdeActions() subscribed to the full store via useIdeStore().
+      Fix pattern: read state on demand with useIdeStore.getState (no
+               subscription) inside action helpers; subscribe only in views
+               that actually render from a slice.
+
+§9  USER PREFERENCES (communication + behaviour)
+--------------------------------------------------------------------------------
+  • Language: English.
+  • Platform: Windows 22H2, PowerShell (no &&, use ;).
+  • Prefers real execution over simulated output.
+  • Prefers to be asked before destructive actions (installs, kills).
+  • Prefers minimal IDE footer (keyboard hints only, no brand).
+  • Wants missing tools handled automatically (installer popup) rather
+    than a bare "not found" error.
+  • Wants the Save button to actually put a file on the computer.
+
+§10 EXTERNAL URLS
+--------------------------------------------------------------------------------
+  COMPANY_URL  = https://stackamit.netlify.app   (StackAmit marketing)
+  Wandbox API  = https://wandbox.org/api
+  Piston API   = https://emkc.org/api/v2/piston  (public: whitelist only)
+
+§11 KNOWN LIMITATIONS / WATCH-LIST
+--------------------------------------------------------------------------------
+  • Compiled-language prompts that omit a trailing newline may not flush
+    before a read blocks when using the SERVER pipe runner (see D5). The
+    desktop integrated terminal (node-pty) is not affected when built.
+  • Desktop integrated terminal requires node-pty rebuilt for Electron; with no
+    VS Build Tools it stays honestly "unavailable" (editing/run/save/package
+    still work). Web mode has no local terminal by design.
+  • /ide AI-chat panel is a placeholder only — it does not call a model.
+  • Desktop packaging currently ships unsigned with the default Electron icon
+    (signAndEditExecutable=false). See D15 / P-11 to brand + sign.
+  • The legacy single-file /editor (Workspace.jsx) and the new /ide coexist;
+    marketing CTAs now point to /ide.
+  • Live lint covers syntax / compile-time errors only; semantic issues
+    that require type inference (e.g. undefined names in Python) are not
+    flagged until Run.
+  • Installer currently supports only winget + choco. scoop is not
+    detected — extend detectPackageManager() in runtimeInstaller.js if
+    scoop is needed.
+  • Auto-install is Windows-centric. On Linux/macOS the installer returns
+    "no package manager" and the user must install the toolchain manually.
+================================================================================

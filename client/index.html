@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="StackAmit-IDE — a fast, free online compiler and code editor. Write, run, and share code in 5 languages. Code. Compile. Create." />
+    <title>StackAmit-IDE — Code. Compile. Create.</title>
+    <script>
+      // Apply saved theme before paint to avoid a flash of the wrong colors.
+      try {
+        var t = localStorage.getItem('stackamit:theme');
+        if (t === 'light') document.documentElement.classList.remove('dark');
+        else document.documentElement.classList.add('dark');
+      } catch (e) {
+        document.documentElement.classList.add('dark');
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

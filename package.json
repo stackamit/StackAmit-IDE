@@ -1,0 +1,25 @@
+{
+  "name": "stackamit-ide",
+  "version": "1.2.10",
+  "private": true,
+  "description": "StackAmit-IDE — a fast, browser-based online compiler and code editor. Code. Compile. Create.",
+  "scripts": {
+    "dev": "concurrently -n server,client -c blue,magenta \"npm:dev:server\" \"npm:dev:client\"",
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev",
+    "dev:desktop": "npm --prefix client run dev:electron",
+    "start": "npm --prefix server run start",
+    "build": "npm --prefix client run build",
+    "build:desktop": "npm --prefix client run build:electron",
+    "dist:win": "npm --prefix client run dist:win",
+    "test": "npm --prefix server run test",
+    "test:client": "npm --prefix client run test",
+    "install:all": "npm install && npm --prefix server install && npm --prefix client install"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

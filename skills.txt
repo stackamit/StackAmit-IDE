@@ -1,0 +1,335 @@
+================================================================================
+StackAmit-IDE — Skills & Knowledge Required
+--------------------------------------------------------------------------------
+What an engineer (or agent) needs to know to work effectively on this repo.
+Updated: 21 October 2026 (language-support expansion)
+================================================================================
+
+§1  LANGUAGES & RUNTIMES
+--------------------------------------------------------------------------------
+  • JavaScript (ES2022+) — the primary implementation language on both sides.
+  • Node.js >= 18 (dev machine runs Node 24.20.0). Understands:
+      - ESM ("type":"module") and the .js import specifier requirement.
+      - child_process.spawn / execFile with windowsHide:true on Windows.
+      - Node's built-in test runner (`node --test`) — no jest.
+      - process.env.PATH vs process.env.Path (case-insensitive on Windows).
+      - File System (fs/promises: mkdtemp, writeFile, rm recursive).
+  • React 18 with function components + hooks; forwardRef/useImperativeHandle.
+  • Python 3 (used in starter templates and by end users).
+  • C, C++, Java basics — enough to read compiler diagnostics and construct
+    valid starter templates.
+  • Windows PowerShell — no '&&', use ';'. Watch for reserved variables
+    like $pid (use $procId).
+
+§2  FRONTEND
+--------------------------------------------------------------------------------
+  • Vite 5 — dev server, build, and the `server.proxy` config. To forward
+    WebSocket upgrades, set `ws: true` on the '/api' proxy entry.
+  • React Router v6 — <Routes>, <Route element={...}>, protected routes
+    via a wrapper component that checks AuthContext.
+  • Tailwind 3 with darkMode:'class'. Custom palettes: brand-* and ink-*.
+  • @monaco-editor/react — controlled wrapper: value+onChange, language,
+    theme='vs-dark'|'light'. onMount(editor, monaco) gives you:
+      - editor.getModel(), getLineCount(), getLineContent()
+      - monaco.editor.setModelMarkers(model, owner, markers)
+      - monaco.MarkerSeverity.Error|Warning|Info|Hint
+      - editor.getAction('editor.action.formatDocument').run()
+    Monaco's TS/JS service validates JavaScript/TypeScript natively —
+    don't double-lint them.
+  • Monaco IS BUNDLED (no CDN): monaco/monacoSetup.js imports the base +
+    language workers via Vite `?worker`, sets self.MonacoEnvironment.getWorker
+    (switch on the worker label) and calls loader.config({ monaco }). Import it
+    FIRST in main.jsx. For multi-file editing use @monaco-editor/react's `path`
+    prop (one model per document) + keepCurrentModel; dispose models on close.
+    Set markers with monaco.editor.setModelMarkers(model, 'stackamit-lint', …).
+  • lucide-react — icon set (Play, Save, Share2, Globe, ArrowUpRight,
+    Code2, Menu, X, Loader2, Zap, ShieldCheck, Terminal, etc.).
+  • Axios — one shared instance in services/api.js with baseURL from
+    VITE_API_URL or empty (relative /api via Vite proxy). Errors are
+    normalized to {status, code, message, details}.
+  • Browser APIs worth knowing:
+      - File System Access API: window.showSaveFilePicker, handle
+        .createWritable, AbortError on user cancel.
+      - Blob + URL.createObjectURL + <a download> as fallback.
+      - WebSocket: window.WebSocket with binaryType='blob' default.
+      - navigator.clipboard.writeText (needs secure context).
+  • Vitest + @testing-library/react — jsdom environment; tests colocated
+    under __tests__/. Use `npm test -- --run` to skip watch mode.
+
+§3  BACKEND
+--------------------------------------------------------------------------------
+  • Express 4 — Router + middleware order; error handler signature
+    (err, req, res, next).
+  • Zod — schema validation; controllers call `validate(schema, body)`
+    which throws ApiError.BAD_REQUEST with details.
+  • Helmet — default security headers. CSP is relaxed in dev (false) and
+    defaults in prod. crossOriginResourcePolicy: 'cross-origin'.
+  • express-rate-limit — per-router limiter. Note `trust proxy` must be
+    set for correct client IP behind a reverse proxy.
+  • pino + pino-http — structured JSON logs; autoLogging.ignore health.
+  • Mongoose 8 — optional; connects lazily. `isDatabaseConnected()` gate
+    everywhere DB is touched so the API degrades gracefully without DB.
+  • jsonwebtoken — HS256 admin bearer tokens; no cookies, no sessions.
+  • ws (WebSocketServer with {noServer:true}) — attach to an existing
+    http.Server via 'upgrade' event, check pathname + origin before
+    calling wss.handleUpgrade.
+  • child_process.spawn for interactive and lint:
+      - Windows needs resolveCommand(cmd) → `${cmd}.exe`.
+      - Use windowsHide:true so a console window doesn't flash.
+      - Piped stdio with data-capped accumulation for streamed output.
+
+§4  EXECUTION PROVIDERS
+--------------------------------------------------------------------------------
+  • Wandbox (default)
+      - POST /compile.json with {code, stdin, compiler, compiler-option,
+        program-option, tar-stdins:false, save:false}.
+      - Response: {program_output, program_error, compiler_output,
+        compiler_error, status, signal, exit_code}.
+      - Broad language coverage (Python, GCC-C/C++, OpenJDK, Node.js).
+      - Free + no key.
+  • Piston (opt-in / self-hosted)
+      - POST /api/v2/runs with {language, version, files:[{name,content}],
+        input, args}.
+      - Public API at emkc.org is WHITELIST-ONLY — you can't request an
+        arbitrary language/version.
+      - Self-hosted allows arbitrary; supports an API key header.
+  • Both are BATCH (request/response) — cannot pause on stdin mid-run.
+    That's why we added a separate interactive WebSocket path.
+
+§5  WINDOWS-SPECIFIC OPERATIONS
+--------------------------------------------------------------------------------
+  • Read Machine + User PATH from the registry via PowerShell:
+      [Environment]::GetEnvironmentVariable('Path','Machine')
+      [Environment]::GetEnvironmentVariable('Path','User')
+    Assign both process.env.PATH and process.env.Path so child spawns see
+    the update regardless of which casing the OS uses.
+
+  • Winget is the default package manager. Ids used here (allow-list):
+      python      → Python.Python.3.12
+      node        → OpenJS.NodeJS.LTS
+      c, cpp      → BrechtSanders.WinLibs.POSIX.UCRT   (MinGW-w64)
+      java        → Microsoft.OpenJDK.21
+    Add --accept-source-agreements --accept-package-agreements
+        --disable-interactivity for unattended installs.
+
+  • Chocolatey fallback ids: python, nodejs-lts, mingw, openjdk.
+    Choco needs an already-elevated shell; winget self-elevates via UAC.
+
+  • UAC prompt IS the real permission gate — the app never elevates
+    silently; the popup shows the exact command before the user consents.
+
+  • Common toolchain install locations we scan if PATH wasn't updated:
+      C:\msys64\{mingw64,ucrt64,clang64}\bin
+      C:\mingw64\bin, C:\TDM-GCC-64\bin, C:\tools\mingw64\bin
+      C:\Program Files\LLVM\bin
+      %LOCALAPPDATA%\Microsoft\WinGet\{Packages\**\bin, Links}
+      C:\ProgramData\chocolatey\bin (shims live here; PATH-registered)
+      C:\Program Files\Microsoft\*\bin            (Microsoft OpenJDK)
+      C:\Program Files\Eclipse Adoptium\*\bin
+      C:\Program Files\Java\*\bin
+      C:\Python*\, %LOCALAPPDATA%\Programs\Python\*\
+
+§6  LIVE SYNTAX CHECKING (LINT) TECHNIQUES
+--------------------------------------------------------------------------------
+  • Python: `python -m py_compile main.py` — prints:
+        File "main.py", line N
+            <source>
+            ^
+      SyntaxError: <msg>
+    Parse: 'File "…", line N' for line; caret index for column; last
+    '*Error: …' line for message.
+  • C / C++: `gcc -fsyntax-only -Wall main.c` — format
+        main.c:LINE:COL: error|warning|fatal error|note: MESSAGE
+  • Java: `javac -proc:none Main.java` — format
+        Main.java:LINE: error|warning: MESSAGE    (no column)
+  • Cap output bytes, hard-timeout each spawn (env.lintTimeoutMs ≈ 4 s),
+    clean up temp dir in a finally block.
+  • Client debounces ~700 ms; stale responses are dropped by a token
+    counter that increments on each keystroke.
+
+§7  SECURE EXECUTION ON A SHARED SERVER
+--------------------------------------------------------------------------------
+  • Never persist source code or stdin (only byte counts in ExecutionLog).
+  • Enforce per-IP rate limits AND a concurrency cap.
+  • Cap source bytes, stdin bytes, output bytes, wall-time, memory.
+  • For local interactive runs: allow-list Origin on WS upgrade; return
+    403/429 rather than upgrading; auto-reap idle sessions.
+  • Admin-only routes use JWT bearer + requireAdmin middleware; do not
+    expose a public registration endpoint.
+  • Installer runs ONLY an allow-listed package id — user sees the exact
+    command; UAC is the real gate.
+  • In production set LOCAL_RUN_ENABLED=false by default. Only opt in.
+
+§8  TESTING
+--------------------------------------------------------------------------------
+  • Backend: node's built-in test runner + supertest against app.js.
+        const res = await request(app).post('/api/code/run').send({...});
+    Integration tests hit the real provider and are gated by env
+    (skip when Wandbox unreachable / CI without secrets).
+  • Frontend: Vitest + @testing-library/react + jsdom. Terminal.test.jsx
+    covers batch run, error diagnostics, and interactive-mode wiring.
+  • /ide unit tests (Vitest, jsdom + node): utils/__tests__/langForFile.test.js
+    (ext -> Monaco language + backend run key), languages/__tests__/
+    languageCapabilities.test.js (registry must not overclaim: grammar tier,
+    IntelliSense tier, runner parity, one extension -> one entry, shared grammar
+    only via variantOf), languages/__tests__/monacoGrammars.test.js (REAL
+    monaco-editor: register our 16 Monarch grammars and assert
+    `monaco.editor.tokenize()` emits comment/keyword/string/number with zero
+    `invalid`; also asserts every 'bundled'/'service' claim exists in Monaco's
+    own language set), languages/__tests__/snippets.test.js, utils/__tests__/
+    languageDefaults.test.js (run defaults are derived from the registry),
+    services/__tests__/workspace.test.js (web virtual-FS provider: CRUD, rename
+    subtree, non-empty delete guard, localStorage persistence), and electron/__tests__/
+    workspaceFs.test.ts (fs guard: outside-root/.. traversal rejected, illegal
+    names, create-clobber, non-recursive delete). Run with `cd client; npm test`.
+  • Electron TS is type-checked separately: `cd client; npm run typecheck:electron`.
+    Test files are excluded from that tsconfig (they run under vitest, not tsc).
+  • Smoke via HTTP for dev:
+        Invoke-RestMethod http://localhost:5000/api/health
+        Invoke-RestMethod http://localhost:5000/api/interactive/status
+        Invoke-RestMethod 'http://localhost:5000/api/interactive/install/plan/c'
+        Invoke-RestMethod 'http://localhost:5000/api/code/lint' -Method Post `
+            -ContentType 'application/json' -Body $json
+
+§9  DEV-TOOL COMFORT
+--------------------------------------------------------------------------------
+  • Windows Process Forensics:
+      Get-CimInstance Win32_Process | Where CommandLine -like '*server.js*'
+      Get-NetTCPConnection -LocalPort 5000,5173,5174
+      taskkill /PID <id> /T /F
+  • Node --watch with --watch-path so node_modules churn doesn't restart.
+  • Vite proxy + WebSocket upgrade (ws:true) — remember to also add the
+    same upgrade path to any production reverse proxy.
+  • PowerShell reserved variables ($pid, $host, $input, $output…) — avoid.
+  • `npm.cmd` (not `npm`) when the shell profile isn't loaded — bare npm
+    may not resolve to the .cmd shim.
+
+§10  EDITOR / MONACO DEEP-DIVE
+--------------------------------------------------------------------------------
+  • Marker owner id is important — 'stackamit-lint' is what we clear/set
+    for our live lint. Never touch Monaco's built-in diagnostic owner.
+  • startColumn is 1-based. endColumn must be >= startColumn and ideally
+    <= lineLength + 1.
+  • On language switch @monaco-editor/react creates a NEW model. Any
+    markers from the previous language are on the old model and vanish
+    automatically — no explicit cleanup required.
+  • MarkerSeverity: Error=8, Warning=4, Info=2, Hint=1.
+  • To disable Monaco native validation for a language, use
+    monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions.
+    We don't disable it — JS/TS get native diagnostics + our markers use
+    a different owner.
+
+§10b LANGUAGE REGISTRY & MONARCH GRAMMAR SKILLS
+--------------------------------------------------------------------------------
+  • Two layers, never merge them: the client registry (editor capability truth,
+    64 entries) and server/src/config/languages.js (batch-runner truth, 18 keys).
+    Capability fields are claims the UI prints, so each one is pinned by a test.
+  • Highlighting tiers: 'service' (7 real language workers) > 'bundled' (37
+    grammars monaco-editor ships) > 'monarch' (16 grammars we wrote) > 'none'.
+    Never describe a Monarch/bundled language as having IntelliSense — basic
+    tier means word-based suggestions + snippets ONLY.
+  • Monaco 0.52 id gotchas: Solidity is `sol`, Protocol Buffers is `proto`,
+    VB is `vb`, F# is `fsharp`, Batch is `bat`, Makefile/HCL/Dockerfile/INI/
+    Clojure/Scala/Swift/R/Perl/Lua/Objective-C/GraphQL all have bundled ids.
+    Check `node_modules/monaco-editor/esm/vs/basic-languages/<id>/<id>.contribution.js`
+    before claiming a grammar exists.
+  • Monarch rules that actually bit us:
+      - `@brackets` only accepts symbols declared in config.brackets — routing
+        `;` or `,` through '@brackets' throws at tokenize time. Use 'delimiter'.
+      - `@number` resolves against the language definition object, so the shared
+        NUMBER pattern is merged onto every spec at registration.
+      - Regex character classes must be ordered: a literal `-` goes LAST or is
+        escaped — `[(),;.%:=><+-*/]` throws "Range out of order in character
+        class" and the whole grammar fails to register.
+      - Template-family grammars (vue/svelte/astro) need an explicit
+        `[/[ \t\r\n]+/, '']` whitespace rule or the catch-all eats ` id=`.
+      - `@push`/`@pop` states must exist before referenced (astro frontmatter).
+      - Order matters: nginx numbers before the generic word rule; makefile
+        targets (with `(?=\s*:(?![=]))`) before assignments.
+  • Verifying a grammar for real: `monaco.editor.tokenize(code, langId)` in
+    vitest (jsdom) needs a window.matchMedia polyfill (src/test/setup.js) and
+    `editor.api.js` + basic-languages + the 4 language-service contributions —
+    `editor.main` cannot boot in jsdom (document.queryCommandSupported).
+  • Snippet bodies escape literal `$` as `\$`; tab stops stay within $0-$9.
+
+§11  UI / UX CONVENTIONS IN THIS APP
+--------------------------------------------------------------------------------
+  • Brand: Logo (image or fallback gradient icon) + "StackAmit" wordmark
+    (with 'Amit' in brand color) + a small IDE badge OUTSIDE the anchor.
+  • Public nav: Home / About / Contact / StackAmit ↗ (Globe + arrow, never
+    a raw URL) / Launch IDE (primary button).
+  • IDE footer is minimal (keyboard hints right-aligned only).
+  • Terminal has two modes toggled in the toolbar: Batch (default) and
+    Interactive (only offered when interactive.enabled=true from server).
+  • Missing-runtime badge is clickable and opens RuntimeInstallModal.
+  • Notification system: notif.success/info/warning/error(msg).
+  • All prefs persist to localStorage with 'stackamit:*' keys:
+      'stackamit:active'  'stackamit:drafts'  'stackamit:split'
+      'stackamit:prefs'   'stackamit:theme'   (via hooks).
+
+§12  PRODUCT-DECISION SKILLS (judgement calls we've made)
+--------------------------------------------------------------------------------
+  • Prefer real execution over simulated output. If we can't do it for
+    real, we say so explicitly rather than faking.
+  • Prefer user-visible consent for anything that touches the machine
+    (installs, PATH changes). Never silent elevation.
+  • Prefer local + cheap over provider-heavy for hot paths (lint, run
+    when the toolchain is installed). Providers are for cold paths.
+  • Prefer graceful degradation: no DB → snippets 503 but everything
+    else keeps working; no local runtime → interactive disabled + hint.
+  • Prefer one canonical registry for language metadata — no scattered
+    switch statements. Adding a language = one object in languages.js
+    (+ PLANS entry for interactive + optional TOOL_EXES/install plan).
+
+§13  COMMON GOTCHAS
+--------------------------------------------------------------------------------
+  • Adding a new npm package with a postinstall script (native modules)
+    may FAIL in restricted environments (see node-pty in the pitfalls
+    library). Verify the script is allow-listed before adding.
+  • Windows paths in spawn args: `.\\main.exe` (double backslash) or use
+    `path.join(tempDir, 'main.exe')` and pass as absolute.
+  • The env var PATH on Windows is case-insensitive but Node caches both
+    `PATH` and `Path`. Update BOTH after a registry refresh.
+  • `mkdtemp` requires a base dir; use `tmpdir()` from os — do NOT
+    hardcode C:\Windows\Temp.
+  • AbortError from showSaveFilePicker is user cancel — treat as a no-op.
+  • Monaco auto-indent + auto-close brackets can confuse headless
+    automation; use "select all + delete + type plain text" patterns.
+  • CORS: adding a new frontend origin means updating BOTH app.js AND
+    interactive.service.js's originAllowed() set.
+
+§14  DESKTOP (ELECTRON) SKILLS
+--------------------------------------------------------------------------------
+  • Process model: main (Node, full OS) / preload (runs before renderer,
+    sandboxed, bridges via contextBridge) / renderer (our React app, no Node).
+    contextIsolation:true + nodeIntegration:false + sandbox:true are required.
+  • IPC: ipcMain.handle for request/response (fs ops), ipcMain.on for streams
+    (terminal write/resize/close) + webContents.send to push terminal data/exit
+    to the renderer. ALWAYS validate event.senderFrame.url against a trusted
+    origin set; return { ok:false, code:'UNTRUSTED_SENDER' } otherwise.
+  • Path security: maintain authorized roots (added only by native dialogs);
+    canonicalize with fs.realpathSync (resolves symlinks) and require the real
+    path to be the root or a descendant (path.relative not starting with '..').
+    Windows compare is case-insensitive — lowercase for comparison.
+  • node-pty is loaded lazily and treated as optional. defaultShell on Windows
+    is COMSPEC/cmd.exe. On load failure return a structured PTY_UNAVAILABLE and
+    let xterm.js show an honest message; never crash the app.
+  • xterm.js wiring: @xterm/xterm + FitAddon + WebLinksAddon; fit on resize;
+    onData -> bridge.terminal.write(id, data); bridge.terminal.onData(id, cb)
+    streams pty output back. Dispose the pty + terminal on tab close.
+  • esbuild for Electron: bundle:true, platform:'node', format:'cjs',
+    target:'node20', external:['electron','node-pty']. Output main.cjs +
+    preload.cjs. In CJS use __dirname (NOT import.meta.url).
+  • Vite for Electron: base:'./' (relative asset paths for file://) and
+    worker.format:'es'. Load dist/index.html in prod; load the Vite URL when
+    ELECTRON_START_URL is set (dev).
+  • Routing: HashRouter on desktop (file:// history reloads break),
+    BrowserRouter on web — chosen from isDesktopMode().
+  • electron-builder (NSIS on Windows): config in client/package.json "build".
+    files:[dist/**, electron/dist/**, package.json]; asarUnpack node-pty so the
+    native .node loads. win.signAndEditExecutable:false avoids the winCodeSign
+    symlink-privilege failure (see pitfalls P-11). Artifacts -> client/release/.
+  • CSP inside Electron: applied via session.webRequest.onHeadersReceived.
+    Needs worker-src 'self' blob: file: for Monaco workers and connect-src for
+    the local API/WS.
+================================================================================

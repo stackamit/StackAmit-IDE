@@ -1,0 +1,1507 @@
+{
+  "verifiedAt": "2026-10-24T16:43:05.909Z",
+  "total": 100,
+  "verified": 100,
+  "missing": [],
+  "errored": [],
+  "behindLatest": [
+    {
+      "id": "commons-lang3",
+      "pinned": "3.17.0",
+      "latest": "3.20.0"
+    },
+    {
+      "id": "commons-text",
+      "pinned": "1.13.0",
+      "latest": "1.15.0"
+    },
+    {
+      "id": "commons-io",
+      "pinned": "2.18.0",
+      "latest": "2.22.0"
+    },
+    {
+      "id": "vavr",
+      "pinned": "0.10.4",
+      "latest": "0.10.6"
+    },
+    {
+      "id": "commons-collections4",
+      "pinned": "4.4",
+      "latest": "4.5.0"
+    },
+    {
+      "id": "fastutil",
+      "pinned": "8.5.15",
+      "latest": "8.5.16"
+    },
+    {
+      "id": "eclipse-collections",
+      "pinned": "11.1.0",
+      "latest": "13.0.0"
+    },
+    {
+      "id": "gson",
+      "pinned": "2.12.1",
+      "latest": "2.14.0"
+    },
+    {
+      "id": "jackson-databind",
+      "pinned": "2.18.3",
+      "latest": "2.18.4"
+    },
+    {
+      "id": "json-org",
+      "pinned": "20240303",
+      "latest": "20250517"
+    },
+    {
+      "id": "okhttp",
+      "pinned": "4.12.0",
+      "latest": "5.0.0-alpha.16"
+    },
+    {
+      "id": "netty-all",
+      "pinned": "4.1.119.Final",
+      "latest": "4.2.1.Final"
+    },
+    {
+      "id": "log4j-core",
+      "pinned": "2.24.3",
+      "latest": "2.26.0"
+    },
+    {
+      "id": "commons-logging",
+      "pinned": "1.3.4",
+      "latest": "1.3.6"
+    },
+    {
+      "id": "tinylog-api",
+      "pinned": "2.7.0",
+      "latest": "2.8.0-M1"
+    },
+    {
+      "id": "junit-jupiter",
+      "pinned": "5.11.4",
+      "latest": "5.13.0-M3"
+    },
+    {
+      "id": "assertj-core",
+      "pinned": "3.27.3",
+      "latest": "4.0.0-M1"
+    },
+    {
+      "id": "mockito-core",
+      "pinned": "5.16.0",
+      "latest": "5.18.0"
+    },
+    {
+      "id": "easymock",
+      "pinned": "5.5.0",
+      "latest": "5.6.0"
+    },
+    {
+      "id": "postgresql",
+      "pinned": "42.7.5",
+      "latest": "42.7.7"
+    },
+    {
+      "id": "mysql-connector-j",
+      "pinned": "9.2.0",
+      "latest": "9.3.0"
+    },
+    {
+      "id": "sqlite-jdbc",
+      "pinned": "3.48.0.0",
+      "latest": "3.49.1.0"
+    },
+    {
+      "id": "mssql-jdbc",
+      "pinned": "12.8.1.jre11",
+      "latest": "12.10.0.jre8"
+    },
+    {
+      "id": "hibernate-core",
+      "pinned": "6.6.13.Final",
+      "latest": "6.6.18.Final"
+    },
+    {
+      "id": "jdbi3-core",
+      "pinned": "3.45.4",
+      "latest": "3.49.3"
+    },
+    {
+      "id": "HikariCP",
+      "pinned": "6.2.1",
+      "latest": "6.3.0"
+    },
+    {
+      "id": "flyway-core",
+      "pinned": "11.4.0",
+      "latest": "11.8.2"
+    },
+    {
+      "id": "joda-time",
+      "pinned": "2.13.1",
+      "latest": "2.14.0"
+    },
+    {
+      "id": "threetenbp",
+      "pinned": "1.7.0",
+      "latest": "1.7.1"
+    },
+    {
+      "id": "hibernate-validator",
+      "pinned": "8.0.2.Final",
+      "latest": "9.0.1.Final"
+    },
+    {
+      "id": "commons-validator",
+      "pinned": "1.9.0",
+      "latest": "1.10.1"
+    },
+    {
+      "id": "tink",
+      "pinned": "1.16.0",
+      "latest": "1.18.0"
+    },
+    {
+      "id": "commons-codec",
+      "pinned": "1.18.0",
+      "latest": "1.22.0"
+    },
+    {
+      "id": "password4j",
+      "pinned": "1.8.3",
+      "latest": "1.8.2"
+    },
+    {
+      "id": "commons-csv",
+      "pinned": "1.13.0",
+      "latest": "1.14.1"
+    },
+    {
+      "id": "poi-ooxml",
+      "pinned": "5.4.0",
+      "latest": "5.5.1"
+    },
+    {
+      "id": "tika-core",
+      "pinned": "3.1.0",
+      "latest": "3.3.1"
+    },
+    {
+      "id": "pdfbox",
+      "pinned": "3.0.4",
+      "latest": "2.0.36"
+    },
+    {
+      "id": "commons-compress",
+      "pinned": "1.27.1",
+      "latest": "1.28.0"
+    },
+    {
+      "id": "itext-core",
+      "pinned": "9.1.0",
+      "latest": "9.2.0"
+    },
+    {
+      "id": "docx4j",
+      "pinned": "11.5.4",
+      "latest": "11.5.3"
+    },
+    {
+      "id": "jsoup",
+      "pinned": "1.19.1",
+      "latest": "1.21.1"
+    },
+    {
+      "id": "javalin",
+      "pinned": "6.6.0",
+      "latest": "6.7.0"
+    },
+    {
+      "id": "dropwizard-core",
+      "pinned": "4.0.13",
+      "latest": "3.0.14"
+    },
+    {
+      "id": "jersey-server",
+      "pinned": "3.1.10",
+      "latest": "3.0.18"
+    },
+    {
+      "id": "undertow-core",
+      "pinned": "2.3.18.Final",
+      "latest": "2.2.37.Final"
+    },
+    {
+      "id": "spring-context",
+      "pinned": "6.2.6",
+      "latest": "7.0.0-M6"
+    },
+    {
+      "id": "dagger",
+      "pinned": "2.56",
+      "latest": "2.56.2"
+    },
+    {
+      "id": "cdi-api",
+      "pinned": "4.1.0",
+      "latest": "5.0.0.Alpha1"
+    },
+    {
+      "id": "picocontainer",
+      "pinned": "2.15",
+      "latest": "2.15.2"
+    },
+    {
+      "id": "protobuf-java",
+      "pinned": "4.30.2",
+      "latest": "4.34.2"
+    },
+    {
+      "id": "avro",
+      "pinned": "1.12.0",
+      "latest": "1.11.5"
+    },
+    {
+      "id": "jansi",
+      "pinned": "2.4.1",
+      "latest": "2.4.2"
+    },
+    {
+      "id": "micrometer-core",
+      "pinned": "1.14.6",
+      "latest": "1.15.0"
+    }
+  ],
+  "results": [
+    {
+      "id": "commons-lang3",
+      "coordinate": "org.apache.commons:commons-lang3:3.17.0",
+      "pinnedVersion": "3.17.0",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "3.20.0",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "guava",
+      "coordinate": "com.google.guava:guava:33.4.8-jre",
+      "pinnedVersion": "33.4.8-jre",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "33.4.8-jre",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "commons-text",
+      "coordinate": "org.apache.commons:commons-text:1.13.0",
+      "pinnedVersion": "1.13.0",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "1.15.0",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "commons-io",
+      "coordinate": "commons-io:commons-io:2.18.0",
+      "pinnedVersion": "2.18.0",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "2.22.0",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "vavr",
+      "coordinate": "io.vavr:vavr:0.10.4",
+      "pinnedVersion": "0.10.4",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "The Apache Software License, Version 2.0"
+      ],
+      "latestVersion": "0.10.6",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "commons-collections4",
+      "coordinate": "org.apache.commons:commons-collections4:4.4",
+      "pinnedVersion": "4.4",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "4.5.0",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "fastutil",
+      "coordinate": "it.unimi.dsi:fastutil:8.5.15",
+      "pinnedVersion": "8.5.15",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "Apache License, Version 2.0"
+      ],
+      "latestVersion": "8.5.16",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "eclipse-collections",
+      "coordinate": "org.eclipse.collections:eclipse-collections:11.1.0",
+      "pinnedVersion": "11.1.0",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "13.0.0",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "pcollections",
+      "coordinate": "org.pcollections:pcollections:4.0.2",
+      "pinnedVersion": "4.0.2",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "The MIT License"
+      ],
+      "latestVersion": "4.0.2",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "hppc",
+      "coordinate": "com.carrotsearch:hppc:0.10.0",
+      "pinnedVersion": "0.10.0",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "Apache 2"
+      ],
+      "latestVersion": "0.10.0",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "gson",
+      "coordinate": "com.google.code.gson:gson:2.12.1",
+      "pinnedVersion": "2.12.1",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "Apache-2.0"
+      ],
+      "latestVersion": "2.14.0",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "jackson-databind",
+      "coordinate": "com.fasterxml.jackson.core:jackson-databind:2.18.3",
+      "pinnedVersion": "2.18.3",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "The Apache Software License, Version 2.0"
+      ],
+      "latestVersion": "2.18.4",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "json-org",
+      "coordinate": "org.json:json:20240303",
+      "pinnedVersion": "20240303",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "Public Domain"
+      ],
+      "latestVersion": "20250517",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "moshi",
+      "coordinate": "com.squareup.moshi:moshi:1.15.2",
+      "pinnedVersion": "1.15.2",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "The Apache Software License, Version 2.0"
+      ],
+      "latestVersion": "1.15.2",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "json-path",
+      "coordinate": "com.jayway.jsonpath:json-path:2.9.0",
+      "pinnedVersion": "2.9.0",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "The Apache Software License, Version 2.0"
+      ],
+      "latestVersion": "2.9.0",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "jdom2",
+      "coordinate": "org.jdom:jdom2:2.0.6.1",
+      "pinnedVersion": "2.0.6.1",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "Similar to Apache License but with the acknowledgment clause removed"
+      ],
+      "latestVersion": "2.0.6.1",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "dom4j",
+      "coordinate": "org.dom4j:dom4j:2.1.4",
+      "pinnedVersion": "2.1.4",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "Plexus"
+      ],
+      "latestVersion": "2.1.4",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "xstream",
+      "coordinate": "com.thoughtworks.xstream:xstream:1.4.21",
+      "pinnedVersion": "1.4.21",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "1.4.21",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "woodstox-core",
+      "coordinate": "com.fasterxml.woodstox:woodstox-core:7.1.0",
+      "pinnedVersion": "7.1.0",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "The Apache License, Version 2.0"
+      ],
+      "latestVersion": "7.1.0",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "commons-digester",
+      "coordinate": "commons-digester:commons-digester:2.1",
+      "pinnedVersion": "2.1",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "2.1",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "okhttp",
+      "coordinate": "com.squareup.okhttp3:okhttp:4.12.0",
+      "pinnedVersion": "4.12.0",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "The Apache Software License, Version 2.0"
+      ],
+      "latestVersion": "5.0.0-alpha.16",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "httpclient",
+      "coordinate": "org.apache.httpcomponents:httpclient:4.5.14",
+      "pinnedVersion": "4.5.14",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "4.5.14",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "async-http-client",
+      "coordinate": "org.asynchttpclient:async-http-client:3.0.2",
+      "pinnedVersion": "3.0.2",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "3.0.2",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "unirest-java",
+      "coordinate": "com.konghq:unirest-java:3.14.5",
+      "pinnedVersion": "3.14.5",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "3.14.5",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "netty-all",
+      "coordinate": "io.netty:netty-all:4.1.119.Final",
+      "pinnedVersion": "4.1.119.Final",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "Apache License, Version 2.0"
+      ],
+      "latestVersion": "4.2.1.Final",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "slf4j-api",
+      "coordinate": "org.slf4j:slf4j-api:2.0.17",
+      "pinnedVersion": "2.0.17",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "2.0.17",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "logback-classic",
+      "coordinate": "ch.qos.logback:logback-classic:1.5.18",
+      "pinnedVersion": "1.5.18",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "1.5.18",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "log4j-core",
+      "coordinate": "org.apache.logging.log4j:log4j-core:2.24.3",
+      "pinnedVersion": "2.24.3",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "Apache-2.0"
+      ],
+      "latestVersion": "2.26.0",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "commons-logging",
+      "coordinate": "commons-logging:commons-logging:1.3.4",
+      "pinnedVersion": "1.3.4",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "1.3.6",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "tinylog-api",
+      "coordinate": "org.tinylog:tinylog-api:2.7.0",
+      "pinnedVersion": "2.7.0",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "The Apache Software License, Version 2.0"
+      ],
+      "latestVersion": "2.8.0-M1",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "junit-jupiter",
+      "coordinate": "org.junit.jupiter:junit-jupiter:5.11.4",
+      "pinnedVersion": "5.11.4",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "Eclipse Public License v2.0"
+      ],
+      "latestVersion": "5.13.0-M3",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "junit4",
+      "coordinate": "junit:junit:4.13.2",
+      "pinnedVersion": "4.13.2",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "Eclipse Public License 1.0"
+      ],
+      "latestVersion": "4.13.2",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "testng",
+      "coordinate": "org.testng:testng:7.11.0",
+      "pinnedVersion": "7.11.0",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "Apache License, Version 2.0"
+      ],
+      "latestVersion": "7.11.0",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "assertj-core",
+      "coordinate": "org.assertj:assertj-core:3.27.3",
+      "pinnedVersion": "3.27.3",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "Apache-2.0"
+      ],
+      "latestVersion": "4.0.0-M1",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "hamcrest",
+      "coordinate": "org.hamcrest:hamcrest:3.0",
+      "pinnedVersion": "3.0",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "BSD-3-Clause"
+      ],
+      "latestVersion": "3.0",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "mockito-core",
+      "coordinate": "org.mockito:mockito-core:5.16.0",
+      "pinnedVersion": "5.16.0",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "MIT"
+      ],
+      "latestVersion": "5.18.0",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "easymock",
+      "coordinate": "org.easymock:easymock:5.5.0",
+      "pinnedVersion": "5.5.0",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "5.6.0",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "jmock",
+      "coordinate": "org.jmock:jmock:2.13.1",
+      "pinnedVersion": "2.13.1",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "2.13.1",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "truth",
+      "coordinate": "com.google.truth:truth:1.4.4",
+      "pinnedVersion": "1.4.4",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "1.4.4",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "podam",
+      "coordinate": "uk.co.jemos.podam:podam:8.0.2.RELEASE",
+      "pinnedVersion": "8.0.2.RELEASE",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "Podam runs under the MIT license"
+      ],
+      "latestVersion": "8.0.2.RELEASE",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "postgresql",
+      "coordinate": "org.postgresql:postgresql:42.7.5",
+      "pinnedVersion": "42.7.5",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "BSD-2-Clause"
+      ],
+      "latestVersion": "42.7.7",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "mysql-connector-j",
+      "coordinate": "com.mysql:mysql-connector-j:9.2.0",
+      "pinnedVersion": "9.2.0",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "The GNU General Public License, v2 with Universal FOSS Exception, v1.0"
+      ],
+      "latestVersion": "9.3.0",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "h2",
+      "coordinate": "com.h2database:h2:2.3.232",
+      "pinnedVersion": "2.3.232",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "MPL 2.0",
+        "EPL 1.0"
+      ],
+      "latestVersion": "2.3.232",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "sqlite-jdbc",
+      "coordinate": "org.xerial:sqlite-jdbc:3.48.0.0",
+      "pinnedVersion": "3.48.0.0",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "The Apache Software License, Version 2.0"
+      ],
+      "latestVersion": "3.49.1.0",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "mssql-jdbc",
+      "coordinate": "com.microsoft.sqlserver:mssql-jdbc:12.8.1.jre11",
+      "pinnedVersion": "12.8.1.jre11",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "MIT License"
+      ],
+      "latestVersion": "12.10.0.jre8",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "hibernate-core",
+      "coordinate": "org.hibernate.orm:hibernate-core:6.6.13.Final",
+      "pinnedVersion": "6.6.13.Final",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "GNU Library General Public License v2.1 or later"
+      ],
+      "latestVersion": "6.6.18.Final",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "mybatis",
+      "coordinate": "org.mybatis:mybatis:3.5.19",
+      "pinnedVersion": "3.5.19",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "3.5.19",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "jdbi3-core",
+      "coordinate": "org.jdbi:jdbi3-core:3.45.4",
+      "pinnedVersion": "3.45.4",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "3.49.3",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "HikariCP",
+      "coordinate": "com.zaxxer:HikariCP:6.2.1",
+      "pinnedVersion": "6.2.1",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "The Apache Software License, Version 2.0"
+      ],
+      "latestVersion": "6.3.0",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "flyway-core",
+      "coordinate": "org.flywaydb:flyway-core:11.4.0",
+      "pinnedVersion": "11.4.0",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "11.8.2",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "joda-time",
+      "coordinate": "joda-time:joda-time:2.13.1",
+      "pinnedVersion": "2.13.1",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "Apache License, Version 2.0"
+      ],
+      "latestVersion": "2.14.0",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "threeten-extra",
+      "coordinate": "org.threeten:threeten-extra:1.8.0",
+      "pinnedVersion": "1.8.0",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "BSD 3-clause"
+      ],
+      "latestVersion": "1.8.0",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "threetenbp",
+      "coordinate": "org.threeten:threetenbp:1.7.0",
+      "pinnedVersion": "1.7.0",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "BSD-3-Clause"
+      ],
+      "latestVersion": "1.7.1",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "time4j-base",
+      "coordinate": "net.time4j:time4j-base:5.9.4",
+      "pinnedVersion": "5.9.4",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "5.9.4",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "cron-utils",
+      "coordinate": "com.cronutils:cron-utils:9.2.1",
+      "pinnedVersion": "9.2.1",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "Apache 2.0"
+      ],
+      "latestVersion": "9.2.1",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "hibernate-validator",
+      "coordinate": "org.hibernate.validator:hibernate-validator:8.0.2.Final",
+      "pinnedVersion": "8.0.2.Final",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "9.0.1.Final",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "jakarta.validation-api",
+      "coordinate": "jakarta.validation:jakarta.validation-api:3.1.1",
+      "pinnedVersion": "3.1.1",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "Apache License 2.0"
+      ],
+      "latestVersion": "3.1.1",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "oval",
+      "coordinate": "net.sf.oval:oval:3.2.1",
+      "pinnedVersion": "3.2.1",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "Eclipse Public License 2.0"
+      ],
+      "latestVersion": "3.2.1",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "commons-validator",
+      "coordinate": "commons-validator:commons-validator:1.9.0",
+      "pinnedVersion": "1.9.0",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "1.10.1",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "json-schema-validator",
+      "coordinate": "com.networknt:json-schema-validator:1.5.6",
+      "pinnedVersion": "1.5.6",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "Apache License Version 2.0"
+      ],
+      "latestVersion": "1.5.6",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "bcprov-jdk18on",
+      "coordinate": "org.bouncycastle:bcprov-jdk18on:1.80",
+      "pinnedVersion": "1.80",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "Bouncy Castle Licence"
+      ],
+      "latestVersion": "1.80",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "tink",
+      "coordinate": "com.google.crypto.tink:tink:1.16.0",
+      "pinnedVersion": "1.16.0",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "Apache License, Version 2.0"
+      ],
+      "latestVersion": "1.18.0",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "jasypt",
+      "coordinate": "org.jasypt:jasypt:1.9.3",
+      "pinnedVersion": "1.9.3",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "The Apache Software License, Version 2.0"
+      ],
+      "latestVersion": "1.9.3",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "commons-codec",
+      "coordinate": "commons-codec:commons-codec:1.18.0",
+      "pinnedVersion": "1.18.0",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "1.22.0",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "password4j",
+      "coordinate": "com.password4j:password4j:1.8.3",
+      "pinnedVersion": "1.8.3",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "Apache License, Version 2.0"
+      ],
+      "latestVersion": "1.8.2",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "commons-csv",
+      "coordinate": "org.apache.commons:commons-csv:1.13.0",
+      "pinnedVersion": "1.13.0",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "1.14.1",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "opencsv",
+      "coordinate": "com.opencsv:opencsv:5.10",
+      "pinnedVersion": "5.10",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "Apache 2"
+      ],
+      "latestVersion": "5.10",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "univocity-parsers",
+      "coordinate": "com.univocity:univocity-parsers:2.9.1",
+      "pinnedVersion": "2.9.1",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "Apache 2"
+      ],
+      "latestVersion": "2.9.1",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "poi-ooxml",
+      "coordinate": "org.apache.poi:poi-ooxml:5.4.0",
+      "pinnedVersion": "5.4.0",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "Apache License, Version 2.0"
+      ],
+      "latestVersion": "5.5.1",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "excel-streaming-reader",
+      "coordinate": "com.github.pjfanning:excel-streaming-reader:5.1.0",
+      "pinnedVersion": "5.1.0",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "The Apache License, Version 2.0"
+      ],
+      "latestVersion": "5.1.0",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "tika-core",
+      "coordinate": "org.apache.tika:tika-core:3.1.0",
+      "pinnedVersion": "3.1.0",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "3.3.1",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "pdfbox",
+      "coordinate": "org.apache.pdfbox:pdfbox:3.0.4",
+      "pinnedVersion": "3.0.4",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "2.0.36",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "commons-compress",
+      "coordinate": "org.apache.commons:commons-compress:1.27.1",
+      "pinnedVersion": "1.27.1",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "1.28.0",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "itext-core",
+      "coordinate": "com.itextpdf:itext-core:9.1.0",
+      "pinnedVersion": "9.1.0",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "GNU Affero General Public License v3"
+      ],
+      "latestVersion": "9.2.0",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "docx4j",
+      "coordinate": "org.docx4j:docx4j-JAXB-ReferenceImpl:11.5.4",
+      "pinnedVersion": "11.5.4",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "Apache 2"
+      ],
+      "latestVersion": "11.5.3",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "jsoup",
+      "coordinate": "org.jsoup:jsoup:1.19.1",
+      "pinnedVersion": "1.19.1",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "The MIT License"
+      ],
+      "latestVersion": "1.21.1",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "htmlunit",
+      "coordinate": "net.sourceforge.htmlunit:htmlunit:2.70.0",
+      "pinnedVersion": "2.70.0",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "Apache License, Version 2.0"
+      ],
+      "latestVersion": "2.70.0",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "owasp-html-sanitizer",
+      "coordinate": "com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20240325.1",
+      "pinnedVersion": "20240325.1",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "20240325.1",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "flexmark-all",
+      "coordinate": "com.vladsch.flexmark:flexmark-all:0.64.8",
+      "pinnedVersion": "0.64.8",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "0.64.8",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "jersey-html",
+      "coordinate": "net.sf.jtidy:jtidy:r938",
+      "pinnedVersion": "r938",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "Java HTML Tidy License"
+      ],
+      "latestVersion": "r938",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "spark-core",
+      "coordinate": "com.sparkjava:spark-core:2.9.4",
+      "pinnedVersion": "2.9.4",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "The Apache Software License, Version 2.0"
+      ],
+      "latestVersion": "2.9.4",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "javalin",
+      "coordinate": "io.javalin:javalin:6.6.0",
+      "pinnedVersion": "6.6.0",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "6.7.0",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "dropwizard-core",
+      "coordinate": "io.dropwizard:dropwizard-core:4.0.13",
+      "pinnedVersion": "4.0.13",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "3.0.14",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "jersey-server",
+      "coordinate": "org.glassfish.jersey.core:jersey-server:3.1.10",
+      "pinnedVersion": "3.1.10",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "EPL 2.0",
+        "The GNU General Public License (GPL), Version 2, With Classpath Exception",
+        "Apache License, 2.0",
+        "Modified BSD"
+      ],
+      "latestVersion": "3.0.18",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "undertow-core",
+      "coordinate": "io.undertow:undertow-core:2.3.18.Final",
+      "pinnedVersion": "2.3.18.Final",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "2.2.37.Final",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "guice",
+      "coordinate": "com.google.inject:guice:7.0.0",
+      "pinnedVersion": "7.0.0",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "7.0.0",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "spring-context",
+      "coordinate": "org.springframework:spring-context:6.2.6",
+      "pinnedVersion": "6.2.6",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "Apache License, Version 2.0"
+      ],
+      "latestVersion": "7.0.0-M6",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "dagger",
+      "coordinate": "com.google.dagger:dagger:2.56",
+      "pinnedVersion": "2.56",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "Apache 2.0"
+      ],
+      "latestVersion": "2.56.2",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "cdi-api",
+      "coordinate": "jakarta.enterprise:jakarta.enterprise.cdi-api:4.1.0",
+      "pinnedVersion": "4.1.0",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "Apache License 2.0"
+      ],
+      "latestVersion": "5.0.0.Alpha1",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "picocontainer",
+      "coordinate": "org.picocontainer:picocontainer:2.15",
+      "pinnedVersion": "2.15",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "2.15.2",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "kryo",
+      "coordinate": "com.esotericsoftware:kryo:5.6.2",
+      "pinnedVersion": "5.6.2",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "5.6.2",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "protobuf-java",
+      "coordinate": "com.google.protobuf:protobuf-java:4.30.2",
+      "pinnedVersion": "4.30.2",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "4.34.2",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "avro",
+      "coordinate": "org.apache.avro:avro:1.12.0",
+      "pinnedVersion": "1.12.0",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "1.11.5",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "protostuff-core",
+      "coordinate": "io.protostuff:protostuff-core:1.8.0",
+      "pinnedVersion": "1.8.0",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [],
+      "latestVersion": "1.8.0",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "msgpack-core",
+      "coordinate": "org.msgpack:msgpack-core:0.9.9",
+      "pinnedVersion": "0.9.9",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "Apache-2.0"
+      ],
+      "latestVersion": "0.9.9",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "lombok",
+      "coordinate": "org.projectlombok:lombok:1.18.38",
+      "pinnedVersion": "1.18.38",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "The MIT License"
+      ],
+      "latestVersion": "1.18.38",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "mapstruct",
+      "coordinate": "org.mapstruct:mapstruct:1.6.3",
+      "pinnedVersion": "1.6.3",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "The Apache Software License, Version 2.0"
+      ],
+      "latestVersion": "1.6.3",
+      "behindLatest": false,
+      "error": null
+    },
+    {
+      "id": "jansi",
+      "coordinate": "org.fusesource.jansi:jansi:2.4.1",
+      "pinnedVersion": "2.4.1",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "Apache License, Version 2.0"
+      ],
+      "latestVersion": "2.4.2",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "micrometer-core",
+      "coordinate": "io.micrometer:micrometer-core:1.14.6",
+      "pinnedVersion": "1.14.6",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "The Apache Software License, Version 2.0"
+      ],
+      "latestVersion": "1.15.0",
+      "behindLatest": true,
+      "error": null
+    },
+    {
+      "id": "spotbugs-annotations",
+      "coordinate": "com.github.spotbugs:spotbugs-annotations:4.9.3",
+      "pinnedVersion": "4.9.3",
+      "pomStatus": 200,
+      "exists": true,
+      "licensesFromPom": [
+        "GNU LESSER GENERAL PUBLIC LICENSE, Version 2.1"
+      ],
+      "latestVersion": "4.9.3",
+      "behindLatest": false,
+      "error": null
+    }
+  ]
+}
