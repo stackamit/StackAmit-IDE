@@ -9,7 +9,8 @@ function toGeminiContents(messages) {
 export function createGeminiProvider(config = aiConfig.gemini) {
   const provider = 'gemini';
   const modelFor = (model) => safeModelId(model) || config.defaultModel || null;
-  const url = (model, action) => `${config.baseUrl}/models/${encodeURIComponent(model)}:${action}?key=${encodeURIComponent(config.apiKey)}`;
+  const url = (model, action) => `${config.baseUrl}/models/${encodeURIComponent(model)}:${action}`;
+  const requestOptions = { headers: { 'x-goog-api-key': config.apiKey } };
   return {
     id: provider,
     name: 'Google Gemini',
@@ -22,7 +23,7 @@ export function createGeminiProvider(config = aiConfig.gemini) {
     },
     async listModels({ signal } = {}) {
       if (!config.enabled) return [];
-      const data = await fetchJson(`${config.baseUrl}/models?key=${encodeURIComponent(config.apiKey)}`, { signal }, provider);
+      const data = await fetchJson(`${config.baseUrl}/models`, { ...requestOptions, signal }, provider);
       const models = (Array.isArray(data.models) ? data.models : []).filter((m) => {
         const methods = Array.isArray(m.supportedGenerationMethods) ? m.supportedGenerationMethods : [];
         return methods.includes('generateContent');
@@ -44,7 +45,7 @@ export function createGeminiProvider(config = aiConfig.gemini) {
       if (!id) throw new AiError('A Gemini model must be selected.', { code: 'AI_MODEL_REQUIRED', status: 400, provider });
       const system = messages.find((m) => m.role === 'system');
       const body = { contents: toGeminiContents(messages), ...(system ? { systemInstruction: { parts: [{ text: String(system.content || '') }] } } : {}) };
-      await fetchStream(url(id, 'streamGenerateContent') + '&alt=sse', { body, signal }, provider, async (line) => {
+      await fetchStream(`${url(id, 'streamGenerateContent')}?alt=sse`, { ...requestOptions, body, signal }, provider, async (line) => {
         const event = parseSseLine(line);
         if (!event) return;
         const delta = event.candidates?.[0]?.content?.parts?.map((p) => p.text || '').join('') || '';

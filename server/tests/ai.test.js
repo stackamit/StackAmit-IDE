@@ -59,3 +59,22 @@ test('Gemini health is unavailable when the configured key returns no text model
     assert.equal(result.code, 'AI_MODELS_UNAVAILABLE');
   } finally { global.fetch = original; }
 });
+
+test('Gemini keeps the API key in the official request header for model listing and streaming', async () => {
+  const original = global.fetch;
+  const calls = [];
+  global.fetch = async (url, init) => {
+    calls.push({ url: String(url), headers: init.headers });
+    if (String(url).endsWith('/models')) return new Response(JSON.stringify({ models: [{ name: 'models/gemini-test', displayName: 'Gemini Test', supportedGenerationMethods: ['generateContent'] }] }));
+    return streamResponse('data: {"candidates":[{"content":{"parts":[{"text":"ok"}]}}]}\n\n');
+  };
+  try {
+    const provider = createGeminiProvider({ enabled: true, apiKey: 'test-secret', baseUrl: 'https://generativelanguage.googleapis.com/v1beta', defaultModel: '' });
+    assert.equal((await provider.listModels())[0].id, 'gemini-test');
+    const chunks = [];
+    await provider.stream({ model: 'gemini-test', messages: [{ role: 'user', content: 'hello' }], onDelta: (value) => chunks.push(value) });
+    assert.deepEqual(chunks, ['ok']);
+    assert.equal(calls.every((call) => call.headers['x-goog-api-key'] === 'test-secret'), true);
+    assert.equal(calls.every((call) => !call.url.includes('test-secret')), true);
+  } finally { global.fetch = original; }
+});

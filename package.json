@@ -1,6 +1,6 @@
 {
   "name": "stackamit-ide",
-  "version": "1.2.10",
+  "version": "1.2.11",
   "private": true,
   "description": "StackAmit-IDE — a fast, browser-based online compiler and code editor. Code. Compile. Create.",
   "scripts": {
