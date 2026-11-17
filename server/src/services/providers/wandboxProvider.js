@@ -62,9 +62,15 @@ export const wandboxProvider = {
     const stdout = truncate(res.program_output || '');
     const stderr = truncate(res.program_error || '');
     const compileFailed = Boolean(res.compiler_error);
+    // Wandbox is a batch provider. A program that calls input() without any
+    // staged stdin receives EOF; expose that fact explicitly so the client can
+    // guide the user to the pre-run input field instead of reporting only a
+    // generic runtime failure.
+    const inputRequired = !stdin && /EOFError|EOF when reading a line|end[- ]of[- ]file/i.test(`${stdout}\n${stderr}`);
 
     let status = 'completed';
     if (compileFailed) status = 'compile_error';
+    else if (inputRequired) status = 'input_required';
     else if (res.signal) status = /timeout/i.test(res.signal) ? 'timeout' : 'runtime_error';
     else if (exitCode !== 0) status = 'runtime_error';
 
@@ -76,6 +82,7 @@ export const wandboxProvider = {
       stdout,
       stderr: compileFailed ? compileMessage : stderr,
       compileMessage,
+      inputRequired,
       exitCode,
       executionTimeMs: null,
       runtime: res.compiler || lang.wandbox.compiler,

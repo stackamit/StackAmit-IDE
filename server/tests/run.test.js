@@ -112,6 +112,25 @@ describe('POST /api/code/run — batch stdin forwarding', () => {
     assert.equal(lastStdin, '');
   });
 
+  test('classifies a batch input EOF so the client can request staged stdin', async () => {
+    restore();
+    restore = stubFetch([
+      ['/list.json', () => [200, [{ name: 'cpython-3.11.10' }]]],
+      ['/compile.json', () => [200, {
+        status: '1',
+        program_output: 'enter your name: ',
+        program_error: 'EOFError: EOF when reading a line',
+        compiler_error: '',
+        compiler: 'cpython-3.11.10',
+      }]],
+    ]);
+    const res = await request(app).post('/api/code/run').send({ language: 'python', sourceCode: 'a = input("enter your name: ")' });
+    assert.equal(res.status, 200);
+    assert.equal(res.body.status, 'input_required');
+    assert.equal(res.body.inputRequired, true);
+    assert.equal(res.body.success, false);
+  });
+
   test('rejects stdin over the byte cap', async () => {
     const huge = 'x'.repeat(20000);
     const res = await request(app).post('/api/code/run').send({ language: 'python', sourceCode: 'print(1)', stdin: huge });

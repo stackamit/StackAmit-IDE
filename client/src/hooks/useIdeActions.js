@@ -750,6 +750,7 @@ export function useIdeActions() {
         const time = typeof r.executionTimeMs === 'number' ? ` · ${r.executionTimeMs}ms` : '';
         if (r.success) store().pushOutput({ kind: 'ok', text: `✓ Finished${time} · exit ${r.exitCode ?? 0}`, executionId, sourcePath: doc.path });
         else if (r.status === 'compile_error') store().pushOutput({ kind: 'fail', text: '✗ Compilation failed', executionId, sourcePath: doc.path });
+        else if (r.inputRequired) store().pushOutput({ kind: 'info', text: 'Input was required but no value was provided. Enter one line per input read in the Standard input (pre-run) box, then run again. Live typing is unavailable because this server is using batch execution.', executionId, sourcePath: doc.path });
         else if (r.status === 'timeout') store().pushOutput({ kind: 'fail', text: '✗ Timed out', executionId, sourcePath: doc.path });
         else store().pushOutput({ kind: 'fail', text: `✗ Runtime error · exit ${r.exitCode ?? 'n/a'}`, executionId, sourcePath: doc.path });
       } catch (e) {
