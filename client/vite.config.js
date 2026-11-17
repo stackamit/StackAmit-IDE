@@ -4,8 +4,12 @@ import react from '@vitejs/plugin-react';
 // The same renderer is used for web mode (served by Vite/host) and Electron
 // (loaded from dist/index.html over file://), so assets use a relative base.
 // Web workers (Monaco) are emitted as bundled chunks — never loaded from a CDN.
+const isElectronBuild = process.env.STACKAMIT_ELECTRON_BUILD === '1';
+
 export default defineConfig({
-  base: './',
+  // Web builds need root-relative assets for deep links; Electron loads from
+  // file:// and therefore needs relative asset paths.
+  base: isElectronBuild ? './' : '/',
   plugins: [react()],
   server: {
     port: 5173,

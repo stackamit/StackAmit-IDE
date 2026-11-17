@@ -17,7 +17,7 @@
     "stage:installer": "node scripts/stage-installer.mjs",
     "dev:electron": "node scripts/dev-electron.mjs",
     "rebuild": "electron-rebuild -f -w node-pty",
-    "dist:win": "npm run build && npm run gen:icon && npm run typecheck:electron && cross-env STACKAMIT_REQUIRE_API_ORIGIN=1 npm run build:electron && electron-builder --win && npm run stage:installer"
+    "dist:win": "cross-env STACKAMIT_ELECTRON_BUILD=1 npm run build && npm run gen:icon && npm run typecheck:electron && cross-env STACKAMIT_REQUIRE_API_ORIGIN=1 npm run build:electron && electron-builder --win && npm run stage:installer"
   },
   "dependencies": {
     "@monaco-editor/react": "^4.6.0",
